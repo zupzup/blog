@@ -1,0 +1,8 @@
+title: Learning Web Security Basics with WebGoat 
+short: "One of the best ways to learn how to defend your web application from malicious attacks is to learn how these attacks actually work and how they are executed. In short - to learn how to hack. Meet WebGoat, a project which can help you achieve exactly that."
+date: 10.12.2016
+tags:
+    - WebGoat
+    - WebSecurity
+    - OWASP
+    - Tutorial
