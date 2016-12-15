@@ -1,0 +1,9 @@
+title: Examples For Using io.Pipe in Go
+short: "The io.Reader and io.Writer interfaces in Go are immensely powerful, yet simple. This post explores how we can use another simple concept to create powerful effects: io.Pipe"
+date: 15.12.2016
+tags:
+    - Go
+    - Golang
+    - io 
+    - interface 
+    - Pipe
