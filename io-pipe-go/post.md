@@ -6,7 +6,7 @@ In this post I want to showcase another part of the Go standard library that I f
 pr, pw := io.Pipe()
 ```
 
-According to the docs, `io.Pipe` creates a synchronous in-memory pipe, which can be used to connect code expecting `io.Reader` with code expexting `io.Writer`.
+According to the docs, `io.Pipe` creates a synchronous in-memory pipe, which can be used to connect code expecting `io.Reader` with code expecting `io.Writer`.
 
 Upon invocation, `io.Pipe()` returns a `PipeReader` and a `PipeWriter`. They are connected (hence the pipe), so that everything written to the `PipeWriter` can be read from the `PipeReader`.
 
