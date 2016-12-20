@@ -51,11 +51,7 @@ So what to do?
 
 ### The Solution
 
-I believe a practical solution to this dilemma is to have an 
-
-<center>
-    <p>**openly communicated rigorous time limit**.</p>
-</center>
+I believe a practical solution to this dilemma is to have a well communicated, but **rigorous time limit**.
 
 So instead of just stating that "talks should be about ~25 minutes", you clearly communicate that talks will be interrupted after exactly 25 minutes. I've seen this work very well in practice and even novice speakers were able to finish within the given timespan. I also believe that this is actually helpful for new speakers. This way they have clear guidelines on what is expected of them and are forced to cut their content down to the essentials.
 
