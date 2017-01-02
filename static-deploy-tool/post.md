@@ -12,29 +12,137 @@ Now...I'm sure there are tons of ready to use solutions for this out there hidde
 
 So off I went!
 
-## Idea
+## Idea & Concept
 
 I started with the following features in mind:
 
 * lightweight CLI
-* simple and secure authentication 
+* simple authentication 
 * upload to S3
-  * configure cache headers for different filesets
-  * configure source with option to ignore some files
+  * configurable cache headers for different file sets
+  * configurable source folder with an option to ignore some files
 * cloudfront invalidation
-  * configure URLs to invalidate
+  * configurable URLs to invalidate
 * dry-run option
   * to test a config before starting to upload / invalidate (which can create costs)
 
 Go is great at creating lightweight CLIs, even without any additional libraries or frameworks. The `flag` package and convenient I/O is usually sufficient for small projects like this.
+For configuration a simple `config.yml` file should suffice with regular expressions for filtering files and file sets for the headers.
 Authentication would be handled either by providing it via the configuration file or via environment variables, which is the way it is done in most tools I use.
 
+So far so good!
 
 ## Implementation
 
+Looking at the feature set, I decided on the following structure:
+
+* main.go
+* package invalidate
+  * invalidate.go
+* package upload
+  * upload.go
+
+This way everyone can use the isolated `invalidate` and `upload` packages on their own if needed.
+
+### main.go 
+
+There's really not much happening here. I use the `flag` package to parse commandline flags and read the `config.yml` file into the following data structure:
+
+```go
+type Config struct {
+    Auth struct {
+        Accesskey string
+        Key       string
+    }
+    S3         upload.Config
+    Cloudfront invalidate.Config
+}
+```
+
+With `S3` and `Cloudfront` representing the configuration objects for my two `worker` packages.
+
+After parsing the configuration file, `main.go` simply calls the other two packages with the given commandline options and respective configuration. We also pass in a `logger`, so the packages don't have to write to Stdout. Another nice benefit of this is that we can easily implement a `silent` flag by passing in the `ioutil.Discard` writer, which throws away all messages written to it.
+
+If an error happens, we just log it and exit.
+
+The full source of `main.go` can be found [here](https://github.com/zupzup/static-aws-deploy/blob/master/main.go)
+
+### upload/upload.go
+
+This is where it gets a little more interesting. The `upload` package has two public functions:
+
+* `ParseFiles`
+  Create and return a map from filepath to headers
+* `Do`
+  Upload the files as specified in the map returned from `ParseFiles`
+
+The configuration object for the `upload` package looks like this:
+
+```go
+type Header map[string]string
+
+type Files map[string][]Header
+
+type Config struct {
+    Bucket struct {
+        Name      string
+        Accesskey string
+        Key       string
+    }
+    Parallel int
+    Source   string
+    Ignore   string
+    Metadata []struct {
+        Regex   string
+        Headers []Header
+    }
+}
+```
+
+`ParseFiles` walks the `Source` folder, ignoring all files matched by the `Ignore` regex and adds the `Headers` given in `Metadata` if the file matches the `Regex`. What comes out is a `Files` object, which is a map from the filepath to the configured headers for the file.
+
+The second function `Do` takes the `Files` object and concurrently (specified by the `Parallel` option) calls `uploadFile` for each of the entries, setting the appropriate headers for each file.
+
+In `uploadFile`, the `Multipart` file is created and sent to the AWS S3 `PUT` endpoint. Initially, I wanted to do this using `io.Pipe`, to efficiently stream the files, using the minimal possible memory footprint, but the AWS API for chunked upload is not compatible with the default implementation of the Go standard library. Although it would certainly be interesting to solve this, it seems very much like premature optimization (especially considering a static blog with filesizes in the low kilobytes). 
+
+Request authentication is done using the great [github.com/smartystreets/go-aws-auth](https://github.com/smartystreets/go-aws-auth) package, which makes it as simple as this:
+
+```go
+req, err := http.NewRequest(...)
+awsauth.Sign(req, awsauth.Credentials{
+    AccessKeyID:     config.Bucket.Accesskey,
+    SecretAccessKey: config.Bucket.Key,
+})
+```
+
+Of course there are a ton of errors which can happen during this I/O heavy process, which are all handled accordingly. In case of a `dry-run`, we only print out the files which would have been uploaded.
+
+The full source of `upload.go` can be found [here](https://github.com/zupzup/static-aws-deploy/blob/master/upload/upload.go)
+
+### invalidate/invalidate.go
+
+The `invalidate` package has only one public function:
+
+* `Do`
+  * creates the XML payload and sends it to the AWS Cloudfront API
+
+Invalidation is a bit simpler than the upload portion. First, we create the XML payload using the amazing [github.com/beevik/etree](https://github.com/beevik/etree) package and then simply send it to the `invalidation` endpoint of the Cloudfront API.
+
+Request authentication works the same way as in the `upload` package. In case of a `dry-run`, we just print the URLs which would be invalidated to the user. In both cases, we handle all errors.
+
+The full source of `invalidate.go` can be found [here](https://github.com/zupzup/static-aws-deploy/blob/master/invalidate/invalidate.go)
+
+That's it - Done! You can see the results [here](https://github.com/zupzup/static-aws-deploy)
 
 ## Conclusion
 
+In my opinion, it's always a fun learning experience to solve small automation problems like this yourself. I also prefer lean, single-purpose tools over big suites or bloated software, which does just about everything if you just configure it right (which can take as long as writing a new tool yourself sometimes...).
+
+Solving this simple problem was also a nice way to improve my Go skills with a few interesting challenges such as concurrently uploading files, building an easy to use CLI and working with a weird XML-based API.
+
+The tool described in this post does exactly what I need right now: It enables me to update my blog with one simple command. If the need arises, I may add some more features to it in the future, but for now I'm pretty happy with it. If there are other people who find it useful - even better! :)
+
+BTW: The fact that you can read this, means that this blogpost was successfully uploaded using the tool described in this post! :)
 
 #### Resources
 
