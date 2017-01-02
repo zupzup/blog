@@ -1,0 +1,9 @@
+title: Deploying a Static Website to AWS with Go 
+short: "This post describes the process of building a small single-purpose tool in Go for deploying static websites to AWS S3 with Cloudfront."
+date: 02.01.2017
+tags:
+    - Golang
+    - Go
+    - deployment
+    - AWS
+    - tool
