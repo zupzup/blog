@@ -1,0 +1,9 @@
+title: API documentation with hapi.js and swagger-ui 
+short: "Documentation is important. Everyone knows it. Yet, writing even the most basic documentation often gets pushed back in a project's life cycle in order to 'iterate quickly'. I believe that some kinds of documentation, like API docs, actually tremendously speed up the iteration cycle, especially in a distributed microservice world where multiple people and teams need to work together."
+date: 12.01.2017
+tags:
+    - nodejs
+    - javascript
+    - hapi 
+    - documentation
+    - swagger-ui
