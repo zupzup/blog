@@ -2,22 +2,24 @@ If you have ever been in a position where you had to consume a **third party API
 
 Now depending on the quality of this documentation, your job was likely either a breeze or absolute hell. Everyone who has been in this situation will know that documentation is important, not only for the success of your current project, but also for the success of every single, small or big, project which will use your code or API in the future.
 
-Yet, although this is, in my experience, known to the majority of professional software developers, it happens regularly that documentation doesn't get done at all, or not enough emphasis is placed on it during development.
+Yet, although, in my experience, this is known to the majority of professional software developers, it happens regularly that documentation doesn't get done at all, or not enough emphasis is placed on it during development.
 
-Especially in recent times, the reasoning behind this has little to with technical aspects in my experience, but rather the development process and business process attached to developing software. People argue that they want to **iterate quickly**, or that they're just in the process of **building an MVP** for validating a business idea. Now there isn't anything wrong with these arguments - if we're not even sure if the thing we're building is a valuable thing, why bother investing in possible future consumers of its API?. I believe this approach is actually OK for a lot of in-depth documentation as well as for high-scale end-to-end testing.
+Especially in recent times, the reasoning behind this has little to with technical aspects in my experience, but rather the development process and business process attached to developing software. People argue that they want to **iterate quickly**, or that they're just in the process of **building an MVP** for validating a business idea.
+
+Now there isn't anything wrong with these arguments - if we're not even sure if the thing we're building is a valuable thing, why bother investing in possible future consumers of its API? I believe this approach of pushing documentation and testing back a little is actually OK for a in-depth documentation as well as for high-scale end-to-end testing.
 
 In this post, however, I want to talk about one specific kind of documentation inherent in creating complex, distributed systems - **API docs**. I believe that, especially when using a microservice architecture, having documentation for these services' interfaces early on in the development cycle provides great benefits regarding collaboration and iteration speed.
 
-Having API docs can be great for getting early feedback from another team, which will have to use the API at some point. The documentation, especially if it's accessible to everyone involved, can also be a useful aid for discussion around complex interactions and workflows in order to find possible problems early.
+Having API docs can, for example, be quite valuable for getting early feedback from another team, which will have to use the API at some point in the future. The documentation, especially if it's accessible to everyone involved, can also be a useful aid for discussion around complex interactions and workflows in order to find possible problems.
 
 This power of being able to detect misunderstandings and straight up errors in thinking early is why, in my opinion, API docs should be available from the time you write the first endpoint.
 
-In the next few paragraphs, I will provide some examples and insight into the process I like to use when creating well documented **Web APIs** using nodeJS.
+In the next few paragraphs, I will provide some examples and insight into the process I like to use when creating well documented **Web APIs** using Node.js.
 
 We will cover:
 
 * [hapi.js](https://hapijs.com/)
-  * my go-to nodeJS web framework for robust and scalable web-applications
+  * my go-to Node.js web framework for robust and scalable web-applications
 * [joi](https://github.com/hapijs/joi)
   * schema validation library for JavaScript objects 
 * [hapi-swaggered](https://github.com/z0mt3c/hapi-swaggered) & [hapi-swaggered-ui](https://github.com/z0mt3c/hapi-swaggered-ui)
@@ -27,11 +29,11 @@ Let's roll!
 
 ## hapi.js & joi
 
-There are countless ways to build web-applications with nodeJS, but my favorite way to do this over the last few years was definitely with the great `hapi.js`. It was created by Walmart in order to sustainably handle the immense load of their services while still being able to iterate quickly. With Walmart backing this project and using it for their own high-scale services, you know it will scale (think Black Friday).
+There are countless ways to build web-applications with Node.js, but my favorite way to do this over the last few years was definitely with the great `hapi.js`. It was created by Walmart in order to sustainably handle the immense load of their services while still being able to iterate quickly. With Walmart backing this project and using it for their own high-scale services, you know it will scale (think Black Friday).
 
-The thing I probably like most about `hapi` is it's impeccable documentation, which is always up-to-date (with very frequent new releases) and its sane approach in developing it further.
+The thing I probably like most about `hapi` is its impeccable documentation, which is always up-to-date (with very frequent new releases) and its sane approach in developing it further.
 
-There are several great tutorials on using `hapi` on the web and in their [tutorials](https://hapijs.com/tutorials), but just to give you a taste on what it looks like, consider this example:
+There are several great tutorials on using `hapi` on the web and in their [tutorials](https://hapijs.com/tutorials), but just to give you a taste of what it looks like, consider this example:
 
 ```javascript
 const Hapi = require('hapi');
@@ -78,7 +80,7 @@ server.route({
 });
 ```
 
- And that's it. And we can do this with path parameters, query parameters, headers and the request payload. If the request doesn't pass validation, `hapi` will respond with a well formed error of the form:
+ That's it. And we can also do this with path parameters, query parameters, headers and the request payload. If the request doesn't pass validation, `hapi` will respond with a well formed error like this:
  
  ```json
  {
@@ -96,7 +98,7 @@ server.route({
 
  These errors are automatically generated based on the `joi` schema and can be customized using the whole power of `joi`, which is considerable.
 
- Another thing we can do is response validation. So we can specify, for each status code, how our response should look like. In the following example, we define a basic error object and extend it for our validation error. These are the schemas we will use for our error responses:
+ Another thing we can do is response validation. So we can specify, for each status code, how our response should look like. In the following example, we define a basic error object and extend it for our validation error. Then, we define how the responses for the different possible status codes should look like: 
 
 ```javascript
 const success = joi.object({
@@ -238,11 +240,11 @@ For further configuration regarding `joi`, `hapi` and `hapi-swaggered` I refer t
 
 ## Conclusion 
 
-This post provided an example of how to automatically generate an interactive API documentation from the existing endpoints of a nodeJS web-application. If you're not into nodeJS, there are similar libraries and tools for other languages and web frameworks not covered in this post.
+This post provided an example of how to automatically generate an interactive API documentation from the existing endpoints of a Node.js web-application. If you're not into Node.js, there are similar libraries and tools for other languages and web frameworks not covered in this post.
 
-I believe that due to the simple setup and configuration of this approach and the immense power of the schema definitions provided by the interaction of these tools, the benefits of doing this far outweighs the extra effort needed to get it to work.
+I believe that due to the simple setup and configuration of this approach and the immense power of the schema definitions provided by the interaction of these tools, the benefits of doing this far outweigh the extra effort needed to get it to work.
 
-Especially with nodeJS, which shines when it comes to iteration speed, but definitely has some trade-offs regarding robustness, the approach of well documented validation schemas, which are checked at runtime has, in my opinion, considerable benefits.
+Especially with Node.js, which shines when it comes to iteration speed, but definitely has some trade-offs regarding robustness and maintenance, the approach of well documented validation schemas, which are checked at runtime has, in my opinion, considerable benefits.
 
 Also, after setting this process up for one project, you can simply re-use it in other projects with the same stack, because the configuration will most likely be quite similar.
 
