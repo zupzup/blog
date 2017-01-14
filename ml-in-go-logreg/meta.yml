@@ -1,0 +1,10 @@
+title: Basic Logistic Regression with Go 
+short: "Machine Learning is rapidly becoming more and more relevant both within the field of Software Development as well as Society as a whole. This post aims to show how very basic Machine Learning techniques can look in Go"
+date: 14.01.2017
+tags:
+    - machinelearning
+    - ml
+    - golang 
+    - go
+    - goml 
+    - logisticregression 
