@@ -1,17 +1,34 @@
-Machine Learning gets lots of attention all around 
+Machine Learning is getting and has been getting lots of attention during the last few years. I spent some time on ML topics when I wrote my thesis and also on- and off after graduating. I find the whole field of Machine Learning and its many possibilities quite fascinating.
 
-Intro:
-ML is fun and can be useful, even for smaller problems. We will look at Logistic Regression and use it to classify students depending on their exam scores if they are going to be admitted. (contrived example, but the same principles work for other things as well)
+However, getting from being interested and fascinated to actual working code, which solves some kind of problem, can be quite daunting. How much previous knowledge does one need to get started? Do you need to fully grasp all those formulas and models? How should I preprocess my data? It's hard to reliably answer those questions, because it really depends on what one wants to achieve and how much energy and time one wants to exert in the process.
 
-Short Primer on Logistic Regression - What is it used for? Regression algorithm, used for classification, think images of cancers and classify as benign or malignant depending on the input data (pixels). Won't go into the nitty gritty, but here are some resources and examples. Basic idea: we have input data and want to know in which category the thing falls depending on this data.
+In this post, I will try to just ignore most of these questions and instead show some code which aims to showcase how a very simple Machine Learning application could look like using Go. This post won't cover any kind of ground regarding the theoretical background of the Machine Learning technique which is used. If you are interested in learning more about Machine Learning (which I would definitely recommend), you'll find some resources I've found useful at the end of the post.
 
-Outline Goal, get some understanding of what such a process could look like. We will use a small sample data set, so the results aren't interesting - this is not the goal, but just go through some of the many steps needed for a production ready ML application, to showcase some of it with Go.
+So, with all of that out of the way, it's time to get going. We will use **Logistic Regression** to create a very basic model which can help us with a **Classification Problem**.
 
-Introduce goml, several libs (link them), but i chose goml for this.
+Ok, so first of all, a **Classification Problem** is simply a problem in which we try to find out, based on existing observations (data), in which category a new observation will (most likely) fall. You can think for example, of a mole or birthmark where we want to find out whether it is malignant or benign. We could use images of moles we've seen in the past and where we know, whether they were malignant or benign (our observations), to train a model try to predict whether a new birthmark might be cancerous or not.
+
+**Logistic Regression** is the algorithm we will use to create this model. [Here](https://en.wikipedia.org/wiki/Logistic_regression) is the wikipedia link and I'm sure there are many other very good resources on this widely used algorithm. Suffice to say, that it is an algorithm which is very well suited for classification problems. We will get into a few aspects of the algorithm later in the code example, because we need to provide some parameters for the algorithm to work properly, but for now it should be enough for us to know that this suits our problem and that the library we are going to use implements it correctly.
+
+The goal here is not, as stated above, to fully understand how **Logistic Regression** works, but rather to get a feeling of which general steps are involved when trying to solve a problem using Machine Learning. We also won't deal with *Big Data* in any way, but rather work with a very small data set of about 100 entries, so there will be little value in interpreting the exact results we get for our little contrived example. But, as you can imagine, the code and techniques shown in this example will also work on other, larger data sets.
+
+We will use Go for our example, but Go is by no means a go-to language for Machine Learning problems. In this area `R`, `Matlab`, `python` and a few others really shine. However, Go is often used in conjunction with these languages to pre- and post-process data as well as to scale these models, which is something Go excels at.
+
+There are a few Machine Learning libraries available in Go, but they are of course nowhere near the maturity of e.g.: [scikit-learn](http://scikit-learn.org/). But for our simple purposes, they will more than do. For this example, I used [goml](https://github.com/cdipaolo/goml). I also took a look at [golearn](https://github.com/sjwhitworth/golearn/), which looks promising as well.
+
+`goml`'s API is pretty straightforward and its [documentation](https://godoc.org/github.com/cdipaolo/goml) is OK as well. 
+
+Alright, let's get started!
 
 ## Data
 
-First of all, we need some data. In this example, we use a very simple, csv-based testset of 
+First of all, we need some data. In this example, we use a very simple, csv-based testset of ....
+
+Explain data set
+
+Of course, if we just test our model on the same data we trained it on, it will work pretty well, but that doesn't tell us how well it will perform in the real world. For this reason, we separate the data into a training set (70%) and a test set (30%). We will use the training set to create our model and then evaluate its performance using the test set.
+
+Using `goml`, we can easily load and parse csv data like this:
 
 ```go
 xTrain, yTrain, err := base.LoadDataFromCSV("./data/studentsTrain.csv")
@@ -23,6 +40,8 @@ if err != nil {
     return err
 }
 ```
+
+In a real world scenario, we would of course further process the data to, for example, remove outliers or normalize the data, but in this simple case, the data is already normalized and we can just go on.
 
 We can also create a scatter plot of the data to get a feel for it using [library1]()
 
@@ -196,3 +215,4 @@ Go is not a traditional language for this (like Matlab, Python scikit, R), but i
 #### Resources
 
 * [goml](https://github.com/cdipaolo/goml)
+//TODO: ML learning resources
