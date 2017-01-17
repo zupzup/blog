@@ -22,13 +22,20 @@ Alright, let's get started!
 
 ## Data
 
-First of all, we need some data. In this example, we use a very simple, csv-based testset of ....
+First of all, we need some data. In this example, we use a very simple, csv-based data set which looks like this:
 
-Explain data set
+```
+exam1Score;exam2Score;accepted
+45.3;38.2;1
+99.1;88.1;0
+...
+```
 
-Of course, if we just test our model on the same data we trained it on, it will work pretty well, but that doesn't tell us how well it will perform in the real world. For this reason, we separate the data into a training set (70%) and a test set (30%). We will use the training set to create our model and then evaluate its performance using the test set.
+This data set is supposed to represent some students' test scores on two exams and whether they were accepted at the instituation where they took the exams. The meaning of the data is not relevant in this small example, but in real-world applications understanding the data and processing it accordingly can often be one of the most important steps.
 
-Using `goml`, we can easily load and parse csv data like this:
+Now, if we just test our model on the same data we trained it on, it will likely work pretty well, but that won't tell us much about how well it will perform in the real world. For this reason, we separate the data into a training set (~70%) and a test set (~30%). We will use the training set to train our model and then evaluate its performance using the test set.
+
+In a real-world example, we would randomize our data and try different splits, but with our meager 100 entry data set it doesn't matter much, so we just manually separate the entries between two files and load them as follows:
 
 ```go
 xTrain, yTrain, err := base.LoadDataFromCSV("./data/studentsTrain.csv")
@@ -41,9 +48,9 @@ if err != nil {
 }
 ```
 
-In a real world scenario, we would of course further process the data to, for example, remove outliers or normalize the data, but in this simple case, the data is already normalized and we can just go on.
+Also, in a real world scenario we would further process the data to, for example, remove outliers or normalize the data, but in our simple case, the data is already normalized and we can just go on.
 
-We can also create a scatter plot of the data to get a feel for it using [library1]()
+We can also create a scatter plot of the data to get a feel for it using [gonum's plot](https://github.com/gonum/plot)
 
 ```go
 func plotData(xTest [][]float64, yTest []float64) error {
@@ -83,10 +90,17 @@ func plotData(xTest [][]float64, yTest []float64) error {
 
 We just take our `x` values to plot the different points and give them a color depending on their correspongin `y` value. This way we have a nice view where the positive and negative outcomes are and how they are distributed.
 
+This shows us the following picture:
+
+<center>
+    <a href="images/exams.png" target="_blank"><img src="images/exams_thmb.png" /></a>
+</center>
+
 ## Model
 
 Learning the model is pretty simple using `goml`. We just call `linear.NewLogistic`, which takes the following parameters:
 
+//TODO: explain parameters
 * Optimization Method
   * Explain
 * Learning Rate
@@ -108,7 +122,7 @@ if err != nil {
 
 Alright, now we have our trained model - easy, right? With this newly created model, we can now use our model to predict the classification of new data using `model.Predict(input []float)`. For example, if we trained a model to classify pictures depending on whether there is a cat in them or not, the `Predict` method could, for a new image, tell us whether our model thinks there is a cat in it.
 
-We can also use this prediction method to evaluate the performance of our trained model on the test set. For this purpose, we will create a so-called Confusion Matrix with the following data structure:
+We can also use this `Predict` method to evaluate the performance of our trained model on the test set. For this purpose, we will create a so-called Confusion Matrix with the following data structure:
 
 ```go
 // ConfusionMatrix describes a confusion matrix
@@ -123,7 +137,17 @@ type ConfusionMatrix struct {
 }
 ```
 
-//TODO: Explain Confusion Matrix
+A [Confusion Matrix](https://en.wikipedia.org/wiki/Confusion_matrix) is an error matrix - a table which can be used to evaluate the performance of a classification algorithm. In order to do this, we record some values during evaluation:
+
+* `positive` - the number of positive examples
+* `negative` - the number of negative examples
+* `truePositive` - the number of positive examples we predicted correctly
+* `trueNegative` - the number of negative examples we predicted correctly
+* `falsePositive` - the number of examples we wrongly predicted to be positive
+* `falseNegative` - the number of examples we wrongly predicted to be negative
+* `accuracy` - measure for the accuracy of the model, defined as (`truePositive` + `trueNegative`) / (`positive` + `negative`)
+
+There are other measures, like the `F1 score`, which are also often used to evaluate the performance of a model, but in our case, we will use only `accuracy`.
 
 In order to implement this, we start by collecting all the positive and negative values of our testSet:
 
@@ -166,7 +190,8 @@ for i := range xTest {
 }
 
 // Calculate Evaluation Metrics
-cm.accuracy = float64(float64(cm.truePositive)+float64(cm.trueNegative)) / float64(float64(cm.positive)+float64(cm.negative))
+cm.accuracy = (float64(cm.truePositive) + float64(cm.trueNegative)) /
+    (float64(cm.positive) + float64(cm.negative))
 ```
 
 Now that we are able to evaluate our model on the test data, we could actually try to tinker with the values to increase our accuracy even further. In practice, we would do this automated of course, testing different ranges of values for each relevant parameter, until we found the best ones. This also could be completely parallelized.
@@ -200,19 +225,23 @@ fmt.Printf("with Decisiion Boundary: %.2f\n", maxAccuracyDb)
 fmt.Printf("with Num Iterations: %d\n", maxAccuracyIter)
 ```
 
-We could to this for all values which are relevant to the model now until we found a model we're satisfied with. There are, of course, less brute-forceish methods of improving your models in the world of Machine Learning theory, which I won't cover here.
+We could to this for all values which are relevant to the model until we find a model we're satisfied with. There are, of course, less brute-forceish methods of improving your models in the world of Machine Learning theory as well.
 
 ## Conclusion 
 
-Conclusion
+In this post we only scratched the surface, but it was, in my opinion, a fun little example where one can tinker around and see how the results change with different input variables. You can also use this code-example as a template and plug in other freely available data sets. 
 
-Of course only scratched the surface, but a fun little example where you can tinker around and see how the variables change. Also possible to use some other open data sets and plug them in.
+Machine Learning will most likely only become even more important as time goes on, so learning it or at least having a deeper look at the fundamentals behind it is probably not a bad investment. Apart from that, I very much enjoy tinkering on Machine Learning problems, so there's that as well. :) 
 
-Machine Learning will be a big part of the future, and already is, so learning it / having a look at it is definitely not a bad investment - and I find it to be a lot of fun :)
-
-Go is not a traditional language for this (like Matlab, Python scikit, R), but it's often used in conjunction with those tools for data processing and scaling out the models create with these other languages. Whether Go will be used for more model traning / evaluation remains to be seen, but it's certainly possible, although the libraries are nowhere near the maturity of these other battle tested things.
+As mentioned in the introduction, Go is not a traditional language for Machine Learning (yet?). Whether Go will be used more for model training / evaluation in the future remains to be seen, but it's certainly not impossible.
 
 #### Resources
 
+* [Full Sample Code on Github](https://github.com/zupzup/ml-in-go-examples/blob/master/logisticregression/logisticregression.go)
 * [goml](https://github.com/cdipaolo/goml)
-//TODO: ML learning resources
+* [golearn](https://github.com/sjwhitworth/golearn/)
+* [gonum's plot](https://github.com/gonum/plot)
+* [scikit-learn](http://scikit-learn.org/)
+- [Coursera ML Course](https://www.coursera.org/learn/machine-learning/home)
+* [Confusion Matrix](https://en.wikipedia.org/wiki/Confusion_matrix)
+* [Logistic Regression](https://en.wikipedia.org/wiki/Logistic_regression)
