@@ -1,12 +1,12 @@
-Machine Learning is getting and has been getting lots of attention during the last few years. I spent some time on ML topics when I wrote my thesis and also on- and off after graduating. I find the whole field of Machine Learning and its many possibilities quite fascinating.
+Machine Learning is getting and has been getting lots of attention over the last couple of years. I spent some time on ML topics when I wrote my thesis and also on- and off after graduating.
 
 However, getting from being interested and fascinated to actual working code, which solves some kind of problem, can be quite daunting. How much previous knowledge does one need to get started? Do you need to fully grasp all those formulas and models? How should I preprocess my data? It's hard to reliably answer those questions, because it really depends on what one wants to achieve and how much energy and time one wants to exert in the process.
 
-In this post, I will try to just ignore most of these questions and instead show some code which aims to showcase how a very simple Machine Learning application could look like using Go. This post won't cover any kind of ground regarding the theoretical background of the Machine Learning technique which is used. If you are interested in learning more about Machine Learning (which I would definitely recommend), you'll find some resources I've found useful at the end of the post.
+In this post, I will try to ignore most of these questions and instead show some code which aims to showcase how a very simple Machine Learning application could look like using Go. This post won't cover any kind of ground regarding the theoretical background of the Machine Learning technique which is used. If you are interested in learning more about Machine Learning (which I would definitely recommend), you should check out the online courses at [Coursera](https://www.coursera.org) on the topic.
 
 So, with all of that out of the way, it's time to get going. We will use **Logistic Regression** to create a very basic model which can help us with a **Classification Problem**.
 
-Ok, so first of all, a **Classification Problem** is simply a problem in which we try to find out, based on existing observations (data), in which category a new observation will (most likely) fall. You can think for example, of a mole or birthmark where we want to find out whether it is malignant or benign. We could use images of moles we've seen in the past and where we know, whether they were malignant or benign (our observations), to train a model try to predict whether a new birthmark might be cancerous or not.
+Ok, so first of all, a **Classification Problem** is simply a problem in which we try to find out, based on existing observations (data), in which category a new observation will (most likely) fall. You can think, for example, of a mole or birthmark which we want to classify as either malignant or benign. We could use images of moles we've seen in the past and where we know whether they were malignant or benign to train a model and try to predict whether a new birthmark might be cancerous or not.
 
 **Logistic Regression** is the algorithm we will use to create this model. [Here](https://en.wikipedia.org/wiki/Logistic_regression) is the wikipedia link and I'm sure there are many other very good resources on this widely used algorithm. Suffice to say, that it is an algorithm which is very well suited for classification problems. We will get into a few aspects of the algorithm later in the code example, because we need to provide some parameters for the algorithm to work properly, but for now it should be enough for us to know that this suits our problem and that the library we are going to use implements it correctly.
 
@@ -18,9 +18,9 @@ There are a few Machine Learning libraries available in Go, but they are of cour
 
 `goml`'s API is pretty straightforward and its [documentation](https://godoc.org/github.com/cdipaolo/goml) is OK as well. 
 
-Alright, let's get started!
+Alright, let's get started! (You'll find the full code of the example incl. data set [here](https://github.com/zupzup/ml-in-go-examples))
 
-## Data
+## The Data
 
 First of all, we need some data. In this example, we use a very simple, csv-based data set which looks like this:
 
@@ -31,7 +31,7 @@ exam1Score;exam2Score;accepted
 ...
 ```
 
-This data set is supposed to represent some students' test scores on two exams and whether they were accepted at the instituation where they took the exams. The meaning of the data is not relevant in this small example, but in real-world applications understanding the data and processing it accordingly can often be one of the most important steps.
+This data set is supposed to represent some students' test scores on two exams and whether they were accepted at the institution where they took the exams. The meaning of the data is not relevant in this small example, but in real-world applications understanding the data and processing it accordingly can often be one of the most important steps.
 
 Now, if we just test our model on the same data we trained it on, it will likely work pretty well, but that won't tell us much about how well it will perform in the real world. For this reason, we separate the data into a training set (~70%) and a test set (~30%). We will use the training set to train our model and then evaluate its performance using the test set.
 
@@ -88,29 +88,28 @@ func plotData(xTest [][]float64, yTest []float64) error {
 }
 ```
 
-We just take our `x` values to plot the different points and give them a color depending on their correspongin `y` value. This way we have a nice view where the positive and negative outcomes are and how they are distributed.
+We just take our `x` values to plot the different points and give them a color depending on their corresponding `y` value. This way we have a nice view where the positive and negative outcomes are and how they are distributed.
 
-This shows us the following picture:
+This shows us the following picture (click to enlarge):
 
 <center>
     <a href="images/exams.png" target="_blank"><img src="images/exams_thmb.png" /></a>
 </center>
 
-## Model
+## The Model
 
 Learning the model is pretty simple using `goml`. We just call `linear.NewLogistic`, which takes the following parameters:
 
-//TODO: explain parameters
-* Optimization Method
-  * Explain
-* Learning Rate
-  * Explain
-* Regularization
-  * Explain
-* Maximum Iterations
-  * Explain
-* Input Values (xTrain)
-* Classification Attribute (yTrain)
+* Optimization Method (`base.BatchGA`)
+  * `goml` has two optimization algorithms for Logistic Regression called **Stochastic Gradient Ascent** and **Batched Gradient Ascent** which are basically [Gradient Descent](https://en.wikipedia.org/wiki/Gradient_descent), just inverted. The goal of these optimization algorithms is to fit the model as closely to our training data as possible by minimizing the error ("distance"). 
+* Learning Rate & Maximum Iterations (`0.00001` & `1000`)
+  * These two parameters are needed for Gradient Descent, they specify how big the steps the algorithm will take towards the minimum should be (Learning Rate) and the maximum amount of iterations it should use to get there, if the algorithm doesn't converge on its own (Maximum Iterations). If we set the Learning Rate too high, it can happen, that we never get near any minimum, so taking a very small number here is the safe approach (although there is a performance penalty, because we'll need more steps).
+* Regularization (`0`)
+  * This is a parameter we can use to prevent Overfitting (fitting the model too closely to our training data), but we will ignore it in this example.
+* Input Values (`xTrain` - the exam scores)
+* Classification Attribute (`yTrain` - the 0 and 1 values for admittance)
+
+Once we have a way to evaluate the model later on, we can start experimenting with these parameters to improve on our model, but for now we just train our model as follows:
 
 ```go
 model := linear.NewLogistic(base.BatchGA, 0.00001, 0, 1000, xTrain, yTrain)
@@ -120,7 +119,7 @@ if err != nil {
 }
 ```
 
-Alright, now we have our trained model - easy, right? With this newly created model, we can now use our model to predict the classification of new data using `model.Predict(input []float)`. For example, if we trained a model to classify pictures depending on whether there is a cat in them or not, the `Predict` method could, for a new image, tell us whether our model thinks there is a cat in it.
+Alright, now we have our trained model - easy, right? We can now use this model to predict the classification of new data using `model.Predict(input []float)`. For example, if we trained a model to classify pictures depending on whether there is a cat in them or not, the `Predict` method could, for a new image, tell us whether our model thinks there is a cat in it (probability).
 
 We can also use this `Predict` method to evaluate the performance of our trained model on the test set. For this purpose, we will create a so-called Confusion Matrix with the following data structure:
 
@@ -163,7 +162,9 @@ for _, y := range yTest {
 }
 ```
 
-Then, we iterate over the testSet, predict the outcome for each data point and record where in our confusion matrix the prediction lands. With these records, we can calculate the accuracy of our model:
+Then, we iterate over the testSet, predicting the outcome for each data point and record where in our confusion matrix the prediction lands. With these records, we can calculate the accuracy of our model:
+
+(Note on the `decisionBoundary`: Our model's `Predict()` method produces probabilities between 0 and 1 and we need to specify at which point (over which value) an example should be classified as `positive`. We could start by simply choosing 50% for example and improve on that later, once we can evaluate the model).
 
 ```go
 // Evaluate the Model on the Test data
@@ -194,8 +195,9 @@ cm.accuracy = (float64(cm.truePositive) + float64(cm.trueNegative)) /
     (float64(cm.positive) + float64(cm.negative))
 ```
 
-Now that we are able to evaluate our model on the test data, we could actually try to tinker with the values to increase our accuracy even further. In practice, we would do this automated of course, testing different ranges of values for each relevant parameter, until we found the best ones. This also could be completely parallelized.
-A very naive implementation without parallelization, which trys different values for the decision boundary could look like this: 
+Now that we are able to evaluate our model on the test data, we could actually try to tinker with the values to increase our accuracy even further. In practice, we would do this automated of course, testing different ranges of values for each relevant parameter, until we found the best ones. This step could also be parallelized quite easily.
+
+A very naive implementation without parallelization which tries different values for the decision boundary could look like this: 
 
 ```go
 var maxAccuracy float64
@@ -221,17 +223,43 @@ for db := 0.05; db < 1.0; db += 0.01 {
 fmt.Printf("Maximum accuracy: %.2f\n\n", maxAccuracy)
 fmt.Printf("with Model: %s\n\n", maxAccuracyModel)
 fmt.Printf("with Confusion Matrix:\n%s\n\n", maxAccuracyCM)
-fmt.Printf("with Decisiion Boundary: %.2f\n", maxAccuracyDb)
+fmt.Printf("with Decision Boundary: %.2f\n", maxAccuracyDb)
 fmt.Printf("with Num Iterations: %d\n", maxAccuracyIter)
 ```
 
 We could to this for all values which are relevant to the model until we find a model we're satisfied with. There are, of course, less brute-forceish methods of improving your models in the world of Machine Learning theory as well.
 
+That's it! A sample output of this simple program could look like this:
+
+```
+Running Logistic Regression...
+Maximum accuracy: 0.91
+
+with Model: h(θ,x) = 1 / (1 + exp(-θx))
+θx = -1.286 + 0.04981(x[1]) + 0.01461(x[2])
+
+with Confusion Matrix:
+Positives: 24
+Negatives: 11
+True Positives: 23
+True Negatives: 9
+False Positives: 2
+False Negatives: 1
+
+Recall: 0.96
+Precision: 0.92
+Accuracy: 0.91
+
+
+with Decision Boundary: 0.91
+with Num Iterations: 2600
+```
+
 ## Conclusion 
 
-In this post we only scratched the surface, but it was, in my opinion, a fun little example where one can tinker around and see how the results change with different input variables. You can also use this code-example as a template and plug in other freely available data sets. 
+In this post we only scratched the surface of Machine Learning in Go, but it was, in my opinion, a fun little example where one can tinker around and see how the results change with different input variables. You can also use this code-example as a template and plug in other freely available data sets. 
 
-Machine Learning will most likely only become even more important as time goes on, so learning it or at least having a deeper look at the fundamentals behind it is probably not a bad investment. Apart from that, I very much enjoy tinkering on Machine Learning problems, so there's that as well. :) 
+Machine Learning will most likely only become even more important as time goes on, so learning it or at least having a deeper look at the fundamentals behind it is probably not a bad investment. Apart from that, I just very much enjoy tinkering on Machine Learning problems, so there's that as well. :) 
 
 As mentioned in the introduction, Go is not a traditional language for Machine Learning (yet?). Whether Go will be used more for model training / evaluation in the future remains to be seen, but it's certainly not impossible.
 
@@ -245,3 +273,4 @@ As mentioned in the introduction, Go is not a traditional language for Machine L
 - [Coursera ML Course](https://www.coursera.org/learn/machine-learning/home)
 * [Confusion Matrix](https://en.wikipedia.org/wiki/Confusion_matrix)
 * [Logistic Regression](https://en.wikipedia.org/wiki/Logistic_regression)
+* [Gradient Descent](https://en.wikipedia.org/wiki/Gradient_descent)
