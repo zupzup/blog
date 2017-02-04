@@ -87,7 +87,7 @@ The first line of the contract tells the compiler which version the following co
 contract WinnerTakesAll {
 ```
 
-TBD
+Afterwards, we define our contract - this is similar to the `class` statement in other languages.
 
 ```javascript
     uint minimumEntryFee;
@@ -97,7 +97,8 @@ TBD
     address public winningAddress;
 ```
 
-TBD
+We define some state variables for our contract, where we will save the initial parameters, which project is in the lead and how much money it has pledged to it.
+Some of these have the `public` modifier, which means, that we can access them (only reading) from the outside. This way, we could display the deadlines and the current winner in our UI.
 
 ```javascript
     struct Project {
@@ -109,7 +110,7 @@ TBD
     }
 ```
 
-TBD
+`Solidity` provides us with the ability to create user-defined structures called `structs`. While we can only use these *inside* our contract, they are still useful to organize our data. In this case, we create a structure for a proposed `Project`.
 
 ```javascript
     mapping (address => Project) projects;
@@ -117,7 +118,11 @@ TBD
     uint public numberOfProjects;
 ```
 
-TBD
+In order to keep track of state-changes within our contract (e.g.: a user pledging money to a project), we also create a so-called `mapping`.
+These mappings are similar to `hashMaps` in other languages, but have some limitations (not iterable for example).
+
+Solidity doesn't let us expose these mappings to the public, so we also track at least the addresses of the proposed projects in an `address[]` array, in order to be able to query info about the proposed projects from the UI.
+Another limitation is, that these arrays, even if they are public, are a bit bothersome to query, so we also save the `numberOfProjects` variable, so we know how many projects are proposed at any point in time.
 
 ```javascript
     event ProjectSubmitted(address addr, string name, string url, bool initialized);
@@ -125,7 +130,9 @@ TBD
     event PayedOutTo(address addr, uint winningFunds);
 ```
 
-TBD
+These `event`s are only here for debugging purposes. We can basically use them to *log* to the blockchain, which can be helpful when testing and debugging the contract. We can also listen to these events using `web3.js`, which is described in the next section.
+
+In this case, we create an event for all our transactions as well as for the finishing of the contract.
 
 ```javascript
     function WinnerTakesAll(uint _minimumEntryFee, uint _durationProjects, uint _durationCampaign) public {
@@ -140,7 +147,13 @@ TBD
     }
 ```
 
-TBD
+Now that we are through with all of our state-variables and events, we get to our functions!
+
+This function is the `constructor`, which is the transaction with which the contract is created. In this case, we supply the two `deadlines` as well as the `minimum entry fee` we want to set.
+
+As you can see, `Solidity` provides a nice API for handling dates with the `now` keyword as well as the possibility to add and subtract time units from it. 
+
+If the campaign deadline is before the duration deadline, we `throw`, which is basically `Solidity`'s way of throwing an error. This means, that the whole transaction is canceled at this point and all funds are returned. 
 
 ```javascript
     function submitProject(string name, string url) payable public returns (bool success) {
@@ -162,7 +175,15 @@ TBD
     }
 ```
 
-TBD
+Alright, with out constructed contract in place, it's time to submit our first project proposal. We do this with the `submitProject` function, which takes a name and a URL of the project.
+
+Notice the use of the `payable` modifier, which means that this is in fact a `transaction`. This means, that we have access to the `msg.value` and `msg.sender` variables, which are the address of the transaction's sender and the money they sent.
+
+We check if the `msg.value` is above our specified minimumEntryFee, and if it's not, we `throw`, canceling the transaction. We also `throw` if the proposal deadline lies in the past.
+
+Then we check, if there is already a project from the sending address with the `initialized` flag. Unfortunately, there is no way to check, whether a `mapping` has a key or not, because it is automatically initialized with every possible key, so we have to do it this way.
+
+If the project is from a new address, we create a `Project`, add it to the `mapping` as well as to our `address[]` list and trigger our `ProjectSubmitted` event.
 
 ```javascript
     function supportProject(address addr) payable public returns (bool success) {
@@ -185,7 +206,11 @@ TBD
     }
 ```
 
-TBD
+Now that we have projects, we can pledge some money to them. That is, if the proposal deadline has run out and we're still before the campaign deadline.
+
+This function is also `payable`, so we again have access to the `msg.value`, which is the amount of money pledged to the project. We check the deadlines, whether the pledged value is a positive number and if there is event a project with the given address. If any of this fails, we `throw` and cancel the transaction.
+
+if everything goes well, we increase the project's funds and update the winning project, also triggering the `ProjectSupported` event for debugging.
 
 ```javascript
     function getProjectInfo(address addr) public constant returns (string name, string url, uint funds) {
@@ -197,7 +222,11 @@ TBD
     }
 ```
 
-TBD
+Now, in order for our UI to be able to display the available projects, which we need to do, because it would be quite hard for a user to support a project if they can't get any infos about it or the address to send the money to, we also provide a `getProjectInfo` function.
+
+Remember, as I stated above, we can't return `struct`s as of yet, but what we can do is return multiple values from one function, which is exactly what we are doing here.
+
+Also notice the `constant` modifier, which means, that this function doesn't modify the state of the blockchain and therefor doesn't cost any Gas.
 
 ```javascript
     function finish() {
@@ -209,7 +238,13 @@ TBD
 }
 ```
 
-TBD
+Alright. Let's say people proposed some projects and we also had some people pledging money to those projects. What happens then? Optimally, we would automatically *end* the contract, once the campaign deadline is over.
+
+However, this is not easy to do, we would have to trigger it based on some time, like a cronjob. Now, there are solutions for this out there such as [this](http://www.ethereum-alarm-clock.com/), but in our case, we will just create a `finish` function, which has to be called at some point after the deadline is over.
+
+If the deadline is not over, we just don't do anything. If it is however, we basically just trigger an `event` and call `selfdestruct` with the `winningAddress`.
+
+This `selfdestruct` is a built-in function, which closes the contract and pays all the money in it to the given address. So this ends our **Winner Takes All Crowdfunding**.
 
 And that's it! Now how can we test this? 
 
