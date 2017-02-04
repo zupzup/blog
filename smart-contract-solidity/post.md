@@ -27,7 +27,7 @@ Maybe a bit crazy and not very practical, but definitely an interesting example 
 
 First up, as with every other software project, we'll need some initial setup to get going. There are already some frameworks (of course there are...) for building DApps, which are mentioned in the resources below. However, in our example we will stay with a very simple setup.
 
-We will use [Solidity](http://solidity.readthedocs.io/en/develop/index.html) as the language for building the contract and [web3.js](https://github.com/ethereum/web3.js) for creating our frontend for interacting with the contract.
+We will use [Solidity](http://solidity.readthedocs.io/en/develop/index.html) as the language for building the contract and [web3.js](https://github.com/ethereum/web3.js) for testing and creating a simple frontend for interacting with the contract.
 
 Because installing dependencies is bothersome, we will also use [Docker](https://www.docker.com/) for running our local blockchain and for building our contract. We will use [testrpc](https://github.com/ethereumjs/testrpc) as our local blockchain, which is convenient, as Smart Contract run on Gas (money) and with testRPC it at least won't cost us any real money and all blocks are mined instantly.
 
@@ -63,24 +63,43 @@ docker pull mzupzup/soliditywatcher
 docker run -v /path/to/this/folder:/sol mzupzup/soliditywatcher
 ```
 
-If it all works, we can start working on our contract!
+If it all works, we can begin working on our contract!
 
 ## Contract Implementation
 
-// TODO: go over contract step-by-step
-// TODO: explain tradeOffs, redundancies (can't return structs / mappings, arrays weird to return)
-// TODO: my first contract, so there are definitely more elegant ways, but If i didn't find them in the docs quickly, I did a workaround
-// TODO: also explain that it moves extremely quickly (0.4.10 vs. 0.4.6) and some of this could already be outdated
+The core part of this application will be the contract. The full code can be found in `contract.sol` within the [GitHub repo](https://github.com/zupzup/solidity-example-crowdfunding). [Here](http://solidity.readthedocs.io/en/develop/index.html) is a link to the official solidity docs.
+
+I found it to be quite convenient to develop the basis of the contract using [browser-solidity](https://ethereum.github.io/browser-solidity/) and then, after I had an idea what it would look like, move to my local setup and `web3.js` testing (described below).
+
+I'll go over the code step by step and explain my reasoning behind the decisions I made. Keep in mind that `Solidity` is under very heavy development. From the time I wrote this example up until now `Solidity` moved from version `0.4.6` to `0.4.10` with lots of changes, so this example could already be outdated when you read it ;)
+
+Also, with this being my first contract and the whole sphere of Smart Contracts being relatively new, there aren't many best-practices established yet, so I'm sure many things can be done more efficiently / elegantly than I managed to do.
+
+I took the simple approach, that when I ran into a problem and couldn't find an answer within the docs or a quick web search, then I built a workaround. Some of there workarounds might seem weird, but if you consider that these contracts need to run on a decentralized, no-trust system, some of the limitations within the language will become pretty clear.
 
 ```javascript
 pragma solidity ^0.4.6;
+```
 
+The first line of the contract tells the compiler which version the following code is written in. 
+
+```javascript
 contract WinnerTakesAll {
+```
+
+TBD
+
+```javascript
     uint minimumEntryFee;
     uint public deadlineProjects;
     uint public deadlineCampaign;
     uint public winningFunds;
     address public winningAddress;
+```
+
+TBD
+
+```javascript
     struct Project {
         address addr;
         string name;
@@ -88,13 +107,27 @@ contract WinnerTakesAll {
         uint funds;
         bool initialized;
     }
+```
+
+TBD
+
+```javascript
     mapping (address => Project) projects;
     address[] public projectAddresses;
     uint public numberOfProjects;
+```
+
+TBD
+
+```javascript
     event ProjectSubmitted(address addr, string name, string url, bool initialized);
     event ProjectSupported(address addr, uint amount);
     event PayedOutTo(address addr, uint winningFunds);
+```
 
+TBD
+
+```javascript
     function WinnerTakesAll(uint _minimumEntryFee, uint _durationProjects, uint _durationCampaign) public {
         if (_durationCampaign <= _durationProjects) {
             throw;
@@ -105,6 +138,11 @@ contract WinnerTakesAll {
         winningAddress = msg.sender;
         winningFunds = 0;
     }
+```
+
+TBD
+
+```javascript
     function submitProject(string name, string url) payable public returns (bool success) {
         if (msg.value < minimumEntryFee) {
             throw;
@@ -122,6 +160,11 @@ contract WinnerTakesAll {
         }
         return false;
     }
+```
+
+TBD
+
+```javascript
     function supportProject(address addr) payable public returns (bool success) {
         if (msg.value <= 0) {
             throw;
@@ -140,6 +183,11 @@ contract WinnerTakesAll {
         ProjectSupported(addr, msg.value);
         return true;
     }
+```
+
+TBD
+
+```javascript
     function getProjectInfo(address addr) public constant returns (string name, string url, uint funds) {
         var project = projects[addr];
         if (!project.initialized) {
@@ -147,6 +195,11 @@ contract WinnerTakesAll {
         }
         return (project.name, project.url, project.funds);
     }
+```
+
+TBD
+
+```javascript
     function finish() {
         if (now >= deadlineCampaign) {
             PayedOutTo(winningAddress, winningFunds);
@@ -156,19 +209,91 @@ contract WinnerTakesAll {
 }
 ```
 
+TBD
+
+And that's it! Now how can we test this? 
+
 ## Debugging / Testing
 
 Debugging and Testing the Smart Contract are not particularly easy, but it's possible. The frameworks mentioned below all include some way of Unit Testing Smart Contracts, for example simply by starting `testRPC` and writing asynchronous JavaScript tests (e.g.: `chai` / `mocha`) with `web3` and validating that they had some impact on the blockchain.
+There are also standalone libraries like [chaithereum](https://github.com/SafeMarket/chaithereum).
 
 I mentioned `Events` above as a mechanic for debugging Solidity contracts and `web3` has a way to listen to these events, which can greatly help when writing complex contract logic.
 
-In general, `web3`, because it is a full API to the blockchain, can be very helpful.
+You can do this using `allEvents`:
 
-// TODO: Code for `allEvents`, code for checking balance before and after, code for doing transactions / checking variables
+```javascript
+var events = myContractInstance.allEvents([additionalFilterObject,] function(err, log){
+  if (!err)
+    console.log(log);
+});
+```
+
+In general, `web3`, because it is a full API to the blockchain, can be very helpful for:
+
+Querying the contract's public interface (Getters / public variables)
+
+```javascript
+crowdfunder.numberOfProjects(function(err, data) {
+    // handle error and data
+});
+
+crowdfunder.projectAddresses[0];
+```
+
+
+Sending transactions to the contract
+
+```javascript
+crowdfunder.submitProject.sendTransaction(projectName, projectURL, {
+    from: senderAddress,
+    value: entryFee,
+    gas: 600000,
+}, function(err, data) {
+    // handle errors and data
+});
+```
+
+Checking the balances of different accounts on the blockchain
+
+```javascript
+web3.eth.getBalance(web3.eth.accounts[0]);
+
+web3.eth.getBalance(web3.eth.accounts[1]);
+```
+
+As well as converting to/from Wei and some other utilities:
+
+```javascript
+web3.fromWei(web3.toDecimal(web3.eth.getBalance(web3.eth.accounts[0])), 'ether');
+
+crowdfunder.minimumEntryFee(function(err, data) {
+    if (!err && data) {
+        console.log(web3.fromWei(web3.toDecimal(data), 'ether') + ' ether'));
+    }
+});
+```
+
+All in all, `web3` is pretty well documented and works as one would expect, providing a rich interface to build and test DApps.
 
 ## Frontend Implementation
 
-I also quickly threw together a simple Web-UI in order to test the application in a nicer way. The code (very ugly and unfinished) for the UI is also on GitHub.
+I also quickly threw together a simple Web-UI in order to test the application in a nicer way. The code (not very pretty and without finishing touches) for the UI is also in the [GitHub repo](https://github.com/zupzup/solidity-example-crowdfunding).
+
+It uses:
+
+* [async.js](https://github.com/caolan/async)
+* [web3.js](https://github.com/ethereum/web3.js)
+* [foundation](http://foundation.zurb.com/) 
+
+The app connects to `testRPC`, compiles the contract and provides handlers and a UI for:
+
+* creating a contract
+* submitting a project proposal
+* pledging ether to a project
+* finishing the contract
+
+Using mostly `web3.js` and the methods mentioned above in **Debugging / Testing**.
 
 This is what it looks like::
 
