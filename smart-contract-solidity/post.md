@@ -65,14 +65,108 @@ docker run -v /path/to/this/folder:/sol mzupzup/soliditywatcher
 
 If it all works, we can start working on our contract!
 
-## Implementation
+## Contract Implementation
 
 // TODO: go over contract step-by-step
 // TODO: explain tradeOffs, redundancies (can't return structs / mappings, arrays weird to return)
+// TODO: my first contract, so there are definitely more elegant ways, but If i didn't find them in the docs quickly, I did a workaround
+// TODO: also explain that it moves extremely quickly (0.4.10 vs. 0.4.6) and some of this could already be outdated
 
-## Testing
+```javascript
+pragma solidity ^0.4.6;
 
-// TODO: some web3 calls, how to call it, how the verify, maybe link some testing framework 
+contract WinnerTakesAll {
+    uint minimumEntryFee;
+    uint public deadlineProjects;
+    uint public deadlineCampaign;
+    uint public winningFunds;
+    address public winningAddress;
+    struct Project {
+        address addr;
+        string name;
+        string url;
+        uint funds;
+        bool initialized;
+    }
+    mapping (address => Project) projects;
+    address[] public projectAddresses;
+    uint public numberOfProjects;
+    event ProjectSubmitted(address addr, string name, string url, bool initialized);
+    event ProjectSupported(address addr, uint amount);
+    event PayedOutTo(address addr, uint winningFunds);
+
+    function WinnerTakesAll(uint _minimumEntryFee, uint _durationProjects, uint _durationCampaign) public {
+        if (_durationCampaign <= _durationProjects) {
+            throw;
+        }
+        minimumEntryFee = _minimumEntryFee;
+        deadlineProjects = now + _durationProjects* 1 seconds;
+        deadlineCampaign = now + _durationCampaign * 1 seconds;
+        winningAddress = msg.sender;
+        winningFunds = 0;
+    }
+    function submitProject(string name, string url) payable public returns (bool success) {
+        if (msg.value < minimumEntryFee) {
+            throw;
+        }
+        if (now > deadlineProjects) {
+            throw;
+        }
+        if (!projects[msg.sender].initialized) {
+            projects[msg.sender] = Project(msg.sender, name, url, 0, true);
+
+            projectAddresses.push(msg.sender);
+            numberOfProjects = projectAddresses.length;
+            ProjectSubmitted(msg.sender, name, url, projects[msg.sender].initialized);
+            return true;
+        }
+        return false;
+    }
+    function supportProject(address addr) payable public returns (bool success) {
+        if (msg.value <= 0) {
+            throw;
+        }
+        if (now > deadlineCampaign || now <= deadlineProjects) {
+            throw;
+        }
+        if (!projects[addr].initialized) {
+            throw;
+        }
+        projects[addr].funds += msg.value;
+        if (projects[addr].funds > winningFunds) {
+            winningAddress = addr;
+            winningFunds = projects[addr].funds;
+        }
+        ProjectSupported(addr, msg.value);
+        return true;
+    }
+    function getProjectInfo(address addr) public constant returns (string name, string url, uint funds) {
+        var project = projects[addr];
+        if (!project.initialized) {
+            throw;
+        }
+        return (project.name, project.url, project.funds);
+    }
+    function finish() {
+        if (now >= deadlineCampaign) {
+            PayedOutTo(winningAddress, winningFunds);
+            selfdestruct(winningAddress);
+        }
+    }
+}
+```
+
+## Debugging / Testing
+
+Debugging and Testing the Smart Contract are not particularly easy, but it's possible. The frameworks mentioned below all include some way of Unit Testing Smart Contracts, for example simply by starting `testRPC` and writing asynchronous JavaScript tests (e.g.: `chai` / `mocha`) with `web3` and validating that they had some impact on the blockchain.
+
+I mentioned `Events` above as a mechanic for debugging Solidity contracts and `web3` has a way to listen to these events, which can greatly help when writing complex contract logic.
+
+In general, `web3`, because it is a full API to the blockchain, can be very helpful.
+
+// TODO: Code for `allEvents`, code for checking balance before and after, code for doing transactions / checking variables
+
+## Frontend Implementation
 
 I also quickly threw together a simple Web-UI in order to test the application in a nicer way. The code (very ugly and unfinished) for the UI is also on GitHub.
 
@@ -84,7 +178,15 @@ This is what it looks like::
 
 ## Conclusion
 
-// TODO: Conclusion
+After getting my feet wet with Smart Contracts, Solidity und Blockchain technology in general, from a developer's perspective, I found it to be very similar to *normal* web development.
+
+I mean sure, on the *backend* it's very different. Instead of a `Go` or `NodeJS` app, there is a Smart Contract running on the Ethereum Blockchain and you have some new trade offs (Gas cost of deployment / state-changing operations).
+
+But from the perspective of a frontend developer, it is actually very similar to usual web development. You have some endpoints which you call asynchronously to fetch data and to do transactions, all packaged up in a (hopefully) nicely designed Single Page Application.
+
+Also, because the Ethereum ecosystem seems to favor JavaScript (`web3`, similarities with `Solidity`), you can, as a JavaScript developer, use a lot of things you already know and love.
+
+I'm curious to see how Blockchain technology, Smart Contracts and especially the Ethereum ecosystem will continue to grow and mature. After having taken a deeper dive, I can at least say that from a developer's perspective, it's not as scary or different as I thought it would be. :)
 
 #### Resources
 
