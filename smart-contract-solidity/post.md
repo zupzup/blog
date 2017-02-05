@@ -12,7 +12,7 @@ First of all, I want to outline the application we're going to build. If I think
 
 I present the **Winner Takes All Crowdfunding Contract**:
 
-* Create contract with
+* Create the contract with
   * Minimum Entry Fee for project proposals (to avoid spam)
   * Project proposal deadline
   * Campaign deadline
@@ -29,16 +29,16 @@ First up, as with every other software project, we'll need some initial setup to
 
 We will use [Solidity](http://solidity.readthedocs.io/en/develop/index.html) as the language for building the contract and [web3.js](https://github.com/ethereum/web3.js) for testing and creating a simple frontend for interacting with the contract.
 
-Because installing dependencies is bothersome, we will also use [Docker](https://www.docker.com/) for running our local blockchain and for building our contract. We will use [testrpc](https://github.com/ethereumjs/testrpc) as our local blockchain, which is convenient, as Smart Contract run on Gas (money) and with testRPC it at least won't cost us any real money and all blocks are mined instantly.
+Because installing dependencies is bothersome, we will also use [Docker](https://www.docker.com/) for running our local blockchain and for building our contract. We will use [testrpc](https://github.com/ethereumjs/testrpc) as our local blockchain, which is convenient, as Smart Contracts use Gas (money) to run and with testRPC it at least won't cost us any real money and all blocks wll be mined instantly.
 
 We won't deploy the contract to any *real* blockchain in this example, but you can find lots of documentation in the official docs of Ethereum and Solidity on that topic.
 
 Now, for compiling our smart contract, there are several options. We can use [browser-solidity](https://ethereum.github.io/browser-solidity/) as a Web-IDE and copy/paste the generated `web3` code from there every time we change something. However, I prefer to work locally.
 
-In order to do that, we need `solc` to compile our contract, then `one-lineify` (remove line breaks) the contract and somehow get it into our JavaScript application with `web3`.
+In order to do that, we need `solc` to compile our contract, then `one-lineify` (remove line breaks) the contract and somehow get it into our JavaScript application with `web3.js`.
 For this purpose, I created a [docker container](https://hub.docker.com/r/mzupzup/soliditybuilder/) which mounts the given folder, runs `solc` on the `contract.sol` file in that folder, then `one-lineify`'s the code and writes it into a `contract.js` file in the same folder.
 
-Now, this works for the purpose of this example, but doesn't generalize well (e.g.: multiple contracts), but the frameworks mentioned below all have mechanisms to avoid having to do this manually.
+Now, this works for the purpose of this example, but doesn't generalize well (e.g.: multiple contracts), but the frameworks mentioned below all have mechanisms for building contracts.
 
 We could also go a different route and automatically paste the binary output of `solc` into the JavaScript file, or really any other way of getting our compiled contract into our application and on the blockchain. But for this very simple example, this simplistic container-based approach will suffice.
 
@@ -67,7 +67,9 @@ If it all works, we can begin working on our contract!
 
 ## Contract Implementation
 
-The core part of this application will be the contract. The full code can be found in `contract.sol` within the [GitHub repo](https://github.com/zupzup/solidity-example-crowdfunding). [Here](http://solidity.readthedocs.io/en/develop/index.html) is a link to the official solidity docs.
+The core part of this application will be the contract. The full code can be found in `contract.sol` within the [GitHub repo](https://github.com/zupzup/solidity-example-crowdfunding).
+
+[Here](http://solidity.readthedocs.io/en/develop/index.html) is a link to the official solidity docs.
 
 I found it to be quite convenient to develop the basis of the contract using [browser-solidity](https://ethereum.github.io/browser-solidity/) and then, after I had an idea what it would look like, move to my local setup and `web3.js` testing (described below).
 
@@ -75,7 +77,7 @@ I'll go over the code step by step and explain my reasoning behind the decisions
 
 Also, with this being my first contract and the whole sphere of Smart Contracts being relatively new, there aren't many best-practices established yet, so I'm sure many things can be done more efficiently / elegantly than I managed to do.
 
-I took the simple approach, that when I ran into a problem and couldn't find an answer within the docs or a quick web search, then I built a workaround. Some of there workarounds might seem weird, but if you consider that these contracts need to run on a decentralized, no-trust system, some of the limitations within the language will become pretty clear.
+I took the simple approach, that when I ran into a problem and couldn't find an answer within the docs or a quick web search, then I built a workaround. Some of these workarounds might seem weird, but if you consider that these contracts need to run on a decentralized, no-trust system, some of the limitations within the language will become more clear.
 
 ```javascript
 pragma solidity ^0.4.6;
@@ -130,7 +132,7 @@ Another limitation is, that these arrays, even if they are public, are a bit bot
     event PayedOutTo(address addr, uint winningFunds);
 ```
 
-These `event`s are only here for debugging purposes. We can basically use them to *log* to the blockchain, which can be helpful when testing and debugging the contract. We can also listen to these events using `web3.js`, which is described in the next section.
+These `event`s are only used debugging purposes in our contract. We can basically use them to *log* to the blockchain, which can be helpful when testing and debugging the contract. We can also listen to these events using `web3.js`, which is described in the next section.
 
 In this case, we create an event for all our transactions as well as for the finishing of the contract.
 
@@ -153,7 +155,7 @@ This function is the `constructor`, which is the transaction with which the cont
 
 As you can see, `Solidity` provides a nice API for handling dates with the `now` keyword as well as the possibility to add and subtract time units from it. 
 
-If the campaign deadline is before the duration deadline, we `throw`, which is basically `Solidity`'s way of throwing an error. This means, that the whole transaction is canceled at this point and all funds are returned. 
+If the campaign deadline is before the proposal deadline, we `throw`, which is basically `Solidity`'s way of throwing an error. This means, that the whole transaction is canceled at this point and all funds are returned. 
 
 ```javascript
     function submitProject(string name, string url) payable public returns (bool success) {
@@ -175,13 +177,13 @@ If the campaign deadline is before the duration deadline, we `throw`, which is b
     }
 ```
 
-Alright, with out constructed contract in place, it's time to submit our first project proposal. We do this with the `submitProject` function, which takes a name and a URL of the project.
+Alright, with our constructed contract in place, it's time to submit our first project proposal. We do this with the `submitProject` function, which takes a name and a URL of the project.
 
 Notice the use of the `payable` modifier, which means that this is in fact a `transaction`. This means, that we have access to the `msg.value` and `msg.sender` variables, which are the address of the transaction's sender and the money they sent.
 
 We check if the `msg.value` is above our specified minimumEntryFee, and if it's not, we `throw`, canceling the transaction. We also `throw` if the proposal deadline lies in the past.
 
-Then we check, if there is already a project from the sending address with the `initialized` flag. Unfortunately, there is no way to check, whether a `mapping` has a key or not, because it is automatically initialized with every possible key, so we have to do it this way.
+Then we check, if there is already a project from the sending address with the `initialized` flag. Unfortunately, there is no way to check whether a `mapping` already includes a key or not, because it is automatically initialized with every possible key, so we have to do it this way.
 
 If the project is from a new address, we create a `Project`, add it to the `mapping` as well as to our `address[]` list and trigger our `ProjectSubmitted` event.
 
@@ -208,7 +210,7 @@ If the project is from a new address, we create a `Project`, add it to the `mapp
 
 Now that we have projects, we can pledge some money to them. That is, if the proposal deadline has run out and we're still before the campaign deadline.
 
-This function is also `payable`, so we again have access to the `msg.value`, which is the amount of money pledged to the project. We check the deadlines, whether the pledged value is a positive number and if there is event a project with the given address. If any of this fails, we `throw` and cancel the transaction.
+This function is also `payable`, so we again have access to the `msg.value`, which is the amount of money pledged to the project. We check the deadlines, whether the pledged value is a positive number and if there is even a project with the given address. If any of this fails, we `throw` and cancel the transaction.
 
 if everything goes well, we increase the project's funds and update the winning project, also triggering the `ProjectSupported` event for debugging.
 
@@ -226,7 +228,7 @@ Now, in order for our UI to be able to display the available projects, which we 
 
 Remember, as I stated above, we can't return `struct`s as of yet, but what we can do is return multiple values from one function, which is exactly what we are doing here.
 
-Also notice the `constant` modifier, which means, that this function doesn't modify the state of the blockchain and therefor doesn't cost any Gas.
+Also notice the `constant` modifier, which means that this function doesn't modify the state of the blockchain and therefore doesn't cost any Gas.
 
 ```javascript
     function finish() {
@@ -240,7 +242,7 @@ Also notice the `constant` modifier, which means, that this function doesn't mod
 
 Alright. Let's say people proposed some projects and we also had some people pledging money to those projects. What happens then? Optimally, we would automatically *end* the contract, once the campaign deadline is over.
 
-However, this is not easy to do, we would have to trigger it based on some time, like a cronjob. Now, there are solutions for this out there such as [this](http://www.ethereum-alarm-clock.com/), but in our case, we will just create a `finish` function, which has to be called at some point after the deadline is over.
+However, this is not easy to do, we would have to trigger it based on some time, like a cronjob. Now, there are solutions for this out there such as [this](http://www.ethereum-alarm-clock.com/), but in our case, we will just create a `finish` function, which has to be called at some point after the deadline is over (by the winner for example).
 
 If the deadline is not over, we just don't do anything. If it is however, we basically just trigger an `event` and call `selfdestruct` with the `winningAddress`.
 
@@ -251,7 +253,7 @@ And that's it! Now how can we test this?
 ## Debugging / Testing
 
 Debugging and Testing the Smart Contract are not particularly easy, but it's possible. The frameworks mentioned below all include some way of Unit Testing Smart Contracts, for example simply by starting `testRPC` and writing asynchronous JavaScript tests (e.g.: `chai` / `mocha`) with `web3` and validating that they had some impact on the blockchain.
-There are also standalone libraries like [chaithereum](https://github.com/SafeMarket/chaithereum).
+There are also useful utilities like [chaithereum](https://github.com/SafeMarket/chaithereum).
 
 I mentioned `Events` above as a mechanic for debugging Solidity contracts and `web3` has a way to listen to these events, which can greatly help when writing complex contract logic.
 
@@ -264,9 +266,11 @@ var events = myContractInstance.allEvents([additionalFilterObject,] function(err
 });
 ```
 
+In this case, we only log the events, but as you can imagine, we could use this to implement features using the event's logging capabilities as well.
+
 In general, `web3`, because it is a full API to the blockchain, can be very helpful for:
 
-Querying the contract's public interface (Getters / public variables)
+Querying the contract's public interface (getters / public variables)
 
 ```javascript
 crowdfunder.numberOfProjects(function(err, data) {
@@ -344,7 +348,7 @@ I mean sure, on the *backend* it's very different. Instead of a `Go` or `NodeJS`
 
 But from the perspective of a frontend developer, it is actually very similar to usual web development. You have some endpoints which you call asynchronously to fetch data and to do transactions, all packaged up in a (hopefully) nicely designed Single Page Application.
 
-Also, because the Ethereum ecosystem seems to favor JavaScript (`web3`, similarities with `Solidity`), you can, as a JavaScript developer, use a lot of things you already know and love.
+Also, because the Ethereum ecosystem seems to favor JavaScript (`web3`, similarities within `Solidity`), JavaScript developers will be able to use many things they already know and love.
 
 I'm curious to see how Blockchain technology, Smart Contracts and especially the Ethereum ecosystem will continue to grow and mature. After having taken a deeper dive, I can at least say that from a developer's perspective, it's not as scary or different as I thought it would be. :)
 
