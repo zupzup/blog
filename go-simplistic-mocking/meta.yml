@@ -1,0 +1,8 @@
+title: Simplistic Mocking in Go 
+short: "After having written many tests with several bloated mocking frameworks in different languages, this is an attempt at a very simplistic utility for mocking in Go"
+date: 18.02.2017
+tags:
+    - go
+    - golang
+    - testing
+    - mock 
