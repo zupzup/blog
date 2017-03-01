@@ -1,0 +1,10 @@
+title: Implementing S3 Delta-Upload for static-aws-deploy
+short: "In this post I describe my implementation of delta-uploading for AWS S3 within the static-aws-deploy tool using Go"
+date: 01.03.2017
+tags:
+    - Golang
+    - Go
+    - S3
+    - deltaupload
+    - AWS
+    - tool
