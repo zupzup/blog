@@ -1,8 +1,0 @@
-title: Network Tunneling with Go 
-short: "In this post, we take a look at how simple it is to do network tunneling with Go's great standard library."
-date: 18.03.2017
-tags:
-    - Go
-    - Golang
-    - network 
-    - tunneling
