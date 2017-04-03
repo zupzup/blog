@@ -1,0 +1,8 @@
+title: Zero Dependencies Web-App in Java 
+short: "In many modern programming languages, you can create web-apps using only the standard library. How well did Java age in this regard?"
+date: 03.04.2017
+tags:
+    - java
+    - dependencies
+    - webapplication 
+    - lean
