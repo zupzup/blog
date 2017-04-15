@@ -4,7 +4,7 @@ Unfortunately, the [go sqlite3 package](https://github.com/mattn/go-sqlite3) is 
 
 For this reason, I looked for alternatives and finally came around to try out [bolt](https://github.com/boltdb/bolt), a simple key/value store written in pure Go. My Data Model isn't very sophisticated, my main reason for using SQLite was because I wanted to use a single file for storage.
 
-In this post, we'll look at one way to implement a given Data Model using bolt and also how the [storm](https://github.com/asdine/storm) toolkit for bolt can be helpful for more advanced problems.
+In this post, we'll look at one way to implement a given Data Model using bolt. The use-case is that of a (possibly offline), standalone application for a single user.
 
 Let's start with the Data Model we want to use.
 
@@ -37,28 +37,27 @@ This simplified Data Model could be used for a calories-tracker application or s
 
 Basically, we want to store the current configuration, the weight changes over time and food/calories entries. With this data it would be possible to calculate an approximate Calories Budget or to display a timeline of the user's eating behaviour. 
 
-Config is simple - we just store it once and update it, if it changes
-
-Weight is also pretty simple - we use the date of the weigh-in as a key and just store the new weight at this time. The last entry is always the current weight and otherwise we fetch the whole timeline.
-
-Entries are a little more complicated, because we want to be able to fetch entries grouped by the days they were booked on, as we're interested in the daily calories budget. it would also be interesting to be able to fetch all days with their entries for a week or month or a defined timespan.
-
 Next, let's look at one way to realize this using bolt.
 
 ## Implementation
 
+Config is simple - we just store it once and update it, if it changes
+
+Weight is also pretty simple - we use the date of the weigh-in as a key and just store the new weight at this time. The last entry is always the current weight and otherwise we fetch the whole timeline.
+
+Entries are a little more complex, because we want to be able to fetch entries grouped by the days they were booked on. It would also be interesting to be able to fetch all days with their entries for a week, month or some other defined timespan.
+
 TBD boltdb example
-
-## Storm 
-
-TBD storm
 
 ## Conclusion 
 
-TBD
+I really enjoyed using Bolt. Although I only used it for a pretty narrow use-case, it's simplicitywas quite refreshing. For me, the fact that it's pure Go is also a nice benefit, but this probably won't be as important for many other applications.
+
+In a future blog post I want to take a look at [storm](https://github.com/asdine/storm), a Toolkit/ORM for Boltdb and maybe try to take on some more complex use-cases.
+
+In any case, Bolt is simple to use, well documented and definitely worth a try. :)
 
 #### Resources
 
 * [Full Sample Code on Github](https://github.com/zupzup/boltdb-example)
 * [boltdb](https://github.com/boltdb/bolt)
-* [storm](https://github.com/asdine/storm)
