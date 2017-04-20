@@ -1,6 +1,6 @@
 title: Playing Around with BoltDB 
 short: "Looking for a simple key/value store for your Go applications? Look no further!"
-date: 18.04.2017
+date: 20.04.2017
 tags:
     - golang
     - go
