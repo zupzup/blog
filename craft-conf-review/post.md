@@ -47,4 +47,4 @@ Thank You to the Craft Conf team for the awesomeness that was 2017's Craft :)
 
 #### Resources
 
-* [craft conf](craft-conf.com)
+* [Craft Conf](https://craft-conf.com/)
