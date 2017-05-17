@@ -1,0 +1,9 @@
+title: BoltDB with Storm 
+short: "BoltDB is a simple and fast key/value store written in pure Go. Storm is a toolkit for BoltDB, which helps us tackle more complex use-cases."
+date: 17.05.2017
+tags:
+    - golang
+    - go
+    - boltdb
+    - bolt
+    - storm

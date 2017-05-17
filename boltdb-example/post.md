@@ -14,7 +14,6 @@ Let's start with the Data Model we want to use.
 type Config struct {
     Birthday time.Time
     Height float
-    Gender string
 }
 ```
 
