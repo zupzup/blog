@@ -1,0 +1,8 @@
+title: Syntax-Highlighting from Markdown using Go 
+short: "This post shows a way to create syntax-highlighted HTML from markdown using just Go"
+date: 03.06.2017
+tags:
+    - golang
+    - go
+    - syntax-highlighting
+    - markdown
