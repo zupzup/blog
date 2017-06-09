@@ -1,0 +1,9 @@
+title: Writing a Static Blog Generator in Go 
+short: "Last november I decided to start writing this Blog. In order to create it, I wrote a static blog generator in Go, which is described in this post."
+date: 17.06.2017
+tags:
+    - golang
+    - go
+    - blog
+    - static
+    - static-site-generator
