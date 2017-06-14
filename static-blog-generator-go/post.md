@@ -99,13 +99,86 @@ The generation is based on `HTML` templates using Go's `html/template` package.
 
 ## Implementation Details
 
-In this section I will just cover a few selected parts I think might be interesting, such as...TBD
+In this section I will just cover a few selected parts I think might be interesting, such as the git `DataSource` and the different `Generators`.
+
+### DataSource
+
+First up, we need some data to generate our blog from. This data, as mentioned above has the form of a git repository. The following `Fetch` function captures most of what the `DataSource` implementation does:
 
 ```go
-type Config struct {
-    Birthday time.Time
-    Height float
+func (ds *GitDataSource) Fetch(from, to string) ([]string, error) {
+	fmt.Printf("Fetching data from %s into %s...\n", from, to)
+	if err := createFolderIfNotExist(to); err != nil {
+		return nil, err
+	}
+	if err := clearFolder(to); err != nil {
+		return nil, err
+	}
+	if err := cloneRepo(to, from); err != nil {
+		return nil, err
+	}
+	dirs, err := getContentFolders(to)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Print("Fetching complete.\n")
+	return dirs, nil
 }
+```
+
+`Fetch` is called with two parameters `from`, which is a repository URL and `to`, which is the destination folder. The function creates and clears the destination folder, clones the repository using `os/exec` plus a git command and finally reads the folder, returning a list of paths for all the files within the repository.
+
+As mentioned above, the repository contains only folders, which represent the different blog posts. The array with these folder paths is then passed to the generators, which can then do their thing for each of the blog posts within the repository.
+
+### Kicking ot all off
+
+After the `Fetch` comes the `Generate` phase. When the `blog-generator` is executed, the following code is executed on the highest level:
+
+```go
+	ds := datasource.New()
+	dirs, err := ds.Fetch(RepoURL, TmpFolder)
+	if err != nil {
+		log.Fatal(err)
+	}
+	g := generator.New(&generator.SiteConfig{
+		Sources:     dirs,
+		Destination: DestFolder,
+	})
+	err = g.Generate()
+	if err != nil {
+		log.Fatal(err)
+	}
+```
+
+The `generator.New` function creates a new `SiteGenerator` which is basically a generator, which calls other generators. It's passed a destination folder and the directories for the blog posts within the repository. 
+
+As every `Generator` implementing the interface mentioned above, the `SiteGenerator` has a `Generate` method, which returns an error. The `Generate` method of the `SiteGenerator` prepares the destination folder, reads in templates, prepares data structures for the blog posts, registers the other generators and concurrently runs them.
+
+The `SiteGenerator` also registers some settings for the blog like the URL, Language, Date Format etc. These settings are simply global constants, which is certainly not the prettiest solution or the most scalable, but it's simple and that was the highest goal here.
+
+### Listing Creation 
+
+```go
+```
+
+### Posts
+
+```go
+```
+
+### Tags
+
+```go
+```
+
+### Sitemap & RSS
+
+```go
+```
+
+### Handling Static Pages
+
+```go
 ```
 
 That's it. You can find the full code [here](https://github.com/zupzup/blog-generator).
