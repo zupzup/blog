@@ -1,0 +1,8 @@
+title: Using Docker Multi-Stage Builds with React 
+short: "Docker has a great new feature in 1.17 called Multi-Stage builds. This post shows a practical example for it using complex Single Page Applications"
+date: 18.06.2017
+tags:
+    - docker
+    - build
+    - multi-stage
+    - react
