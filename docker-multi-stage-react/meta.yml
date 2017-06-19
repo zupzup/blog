@@ -1,6 +1,6 @@
 title: Using Docker Multi-Stage Builds for SPAs 
 short: "Docker has a great new feature in 1.17 called Multi-Stage builds. This post shows a practical example for it using complex Single Page Applications"
-date: 18.06.2017
+date: 19.06.2017
 tags:
     - docker
     - build
