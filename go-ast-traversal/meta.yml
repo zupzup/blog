@@ -1,0 +1,7 @@
+title: Basic AST Traversal in Go 
+short: "Looking at and interacting with the AST (Abstract Syntax Tree) of a program can be both interesting and useful for automation. In this post, we'll look at an example of how to parse a Go program to an AST and how to analyse it."
+date: 14.07.2017
+tags:
+    - Go
+    - Golang
+    - ast 
