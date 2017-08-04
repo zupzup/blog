@@ -1,0 +1,8 @@
+title: Ethereum Light-Client with React Native 
+short: "Light-Clients are a concept widely regarded as important in the Blockchain community due to their fully decentralized nature. In this post, we'll look at an example of how to integrate the go-ethereum light-client with a React Native app"
+date: 04.08.2017
+tags:
+    - blockchain
+    - ethereum
+    - reactnative 
+    - lightclient
