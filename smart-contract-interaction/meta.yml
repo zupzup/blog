@@ -1,0 +1,8 @@
+title: Interactions between Smart Contracts with Solidity 
+short: "The ability for Smart Contracts to call other contracts can be quite useful for several use-cases, which will be described in this post."
+date: 08.09.2017
+tags:
+    - blockchain
+    - ethereum
+    - smartcontracts 
+    - solidity
