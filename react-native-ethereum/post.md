@@ -269,3 +269,4 @@ I was, however, quite pleased with how well the react-native part worked. Wrappi
 * [walleth](https://github.com/walleth/walleth)
 * [status-go](https://github.com/status-im/status-go)
 * [geth mobile docs](https://github.com/ethereum/go-ethereum/wiki/Mobile:-Introduction)
+* [block42](http://block42.org/)

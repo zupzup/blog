@@ -138,3 +138,4 @@ But there is a lot of research and experimenting going on now, so I'm sure we're
 * [Official Solidity Docs](http://solidity.readthedocs.io/en/develop/index.html)
 * [remix](https://remix.ethereum.org)
 * [ethereum](https://ethereum.org/)
+* [block42](http://block42.org/)

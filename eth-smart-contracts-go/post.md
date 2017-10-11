@@ -209,4 +209,4 @@ Go lends itself nicely to the task of interacting with Ethereum-based smart cont
 * [Full Code Example](https://github.com/zupzup/smart-contracts-with-go)
 * [go-ethereum](https://github.com/ethereum/go-ethereum)
 * [geth Go Bindings documentation](https://github.com/ethereum/go-ethereum/wiki/Native-DApps:-Go-bindings-to-Ethereum-contracts)
-
+* [block42](http://block42.org/)
