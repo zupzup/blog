@@ -1,27 +1,27 @@
-Working on a project for the last couple of months with the guys of [block42](http://block42.org/), we noticed that in order to use a technology such as Ethereum in a real-world project, every user needs to have an accound with some ether to be able to interact with the blockchain.
+Working on a project for the last couple of months with the guys from [block42](http://block42.org/), we talked about, how to use a technology such as Ethereum in a real-world project, every potential user needs to have an account with some ether to be able to interact with the blockchain and hence with the product.
 
-This poses a real problem, as either Ethereum nor BitCoin or any other blockchain technology is anywhere near mainstream adoption yet and won't be for the foreseeable future.
+This poses a real problem, as neither Ethereum nor Bitcoin or any other blockchain technology is anywhere near mainstream adoption yet and won't be for the foreseeable future.
 
-Also, even if a user has dabbled in cryptocurrencies, there is no guarantee that the user holds ether or the currency needed on the platform you are using. To tackle this issue, there is a [proposal](https://github.com/ethereum/EIPs/blob/bd136e662fca4154787b44cded8d2a29b993be66/EIPS/abstraction.md) on Ethereum to make it possible for contracts to pay for transactions. Unfortunately, this change will hit, at the earliest, somewhere around next year with the second Metropolis release "Constantinople".
+Also, even if a user has dabbled in cryptocurrencies, there is no guarantee that the user holds ether or the currency needed on the current platform. To tackle this issue, there is a [proposal](https://github.com/ethereum/EIPs/blob/bd136e662fca4154787b44cded8d2a29b993be66/EIPS/abstraction.md) on Ethereum to make it possible for contracts to pay for transactions. Unfortunately, this change will hit, at the earliest, somewhere around next year with the second Metropolis release "Constantinople".
 
-In the meantime, there are several workarounds one can do with different tradeoffs each. This post will show a Proof-of-Concept implementation of one of these workarounds with Go.
+In the meantime, there are several workarounds one can do with different trade-offs each. This post will show a Proof-of-Concept implementation of one of these workarounds with Go.
 
 ## Concept
 
-The idea is pretty simple. A User requests something (e.g.: some kind of Agreement) and, if the Server is okay with it, the Server puts it on the blockchain, inside a smart-contract. Now the Server wants the User to sign the Agreement on the blockchain, to be able to proof afterwards, that both parties agreed.
+The idea is simple. A User requests something (e.g.: some kind of Agreement) and, if the Server is okay with it, the Server puts it on the blockchain inside a smart-contract. Now the Server wants the User to sign the Agreement on the blockchain, to have proof afterwards, that both parties agreed.
 
-The User doesn't have any ether, so the Server sends enough ether to the User (very minimal amount for the transaction fee). Of course, the User needs an Ethereum address to be able to receive it and to be able to sign the Agreement. For this purpose, there might be an App or WebApp, which creates an Account for the user and provides the ability to validate the Agreement, as it is saved on the blockchain and to sign it using the received transaction fee.
+The User doesn't have any ether, so the Server sends enough ether to the User (a minimal amount for the transaction fee). Of course, the User needs an Ethereum address to be able to receive it and to be able to sign the Agreement. For this purpose, there might be an App or WebApp, which creates an Account for the user and provides the ability to validate the Agreement saved on the blockchain and to sign it using the received transaction fee.
 
 **Example:**
 
 * User installs App and Ethereum Account (Address) is created for the User
 * User sends an *Agreement* and Public Key to the Server
-* Server puts the *Agreement* on the smart-contract, only accessible by the Users address
+* Server puts the *Agreement* on the smart-contract
 * Server sends a calculated Transaction Fee to the User, which is enough that the User can sign the *Agreement*
 * User can now query the *Agreement* on the smart-contract and check if it's OK
 * User can, once the Transaction Fee arrived, Sign the *Agreement* on the smart-contract
 
-Now, of course this approach won't work for many use-cases and there need to be some anti-fraud mechanisms in place. Also, it introduces some centralization, which is always frowned upon in blockchain applications. But the approach helps both sides, the User and the Server, to have persistent proof on the blockchain, that they agreed on something at some time.
+This approach won't work for many use-cases and there need to be some anti-fraud mechanisms in place for it to be usable. Also, it introduces some centralization, which is always frowned upon in blockchain applications. But the approach helps both sides, the User and the Server, to have persistent proof on the blockchain, that they agreed on something at some time without the need for both parties to deal with cryptocurrency.
 
 A Proof of Concept of this can be implemented using a Webserver as the *Server*  and a WebApp as the *Client*, [testrpc](https://github.com/ethereumjs/testrpc) can be used for local testing.
 
@@ -36,7 +36,7 @@ docker run -d --name=preprpc -p 8545:8545 harshjv/testrpc --account="0xb4087f10e
 
 This starts testrpc with two accounts, one with funds (Server) and one without any funds (User).
 
-Then, the smart contract. For this example, there is not much to it:
+Then, we need the smart contract. For this simple example, there is not much to it:
 
 ```javascript
 pragma solidity ^0.4.6;
@@ -78,7 +78,9 @@ contract Signer {
 
 Basically, the contract holds a mapping from `address` to `Agreement`, so there is, at any time, at most one agreement per address. Agreements can only be created by the owner of the contract (`onlyBy`), but anyone can call `getAgreement`, to see agreements for a certain address.
 
-Then there is the `signAgreement` transaction-method. In this method, the User simply sends a transaction and the active agreement, if there is one (`initialized==true`), and if it's not already signed (`signed == false`), is signed. This is the transaction, the User needs the transaction fee for. Not much is happening here, so it will be pretty cheap.
+Then there is the `signAgreement` transaction-method. In this method, the User simply sends a transaction and the active agreement, if there is one (`initialized==true`), and if it's not already signed (`signed == false`), is signed. This is the transaction, the User needs the transaction fee for. Not much is happening here, so it will be cheap.
+
+I didn't spend any time optimizing or securing this contract, so don't take it as a template for anything you're building. It's just there to showcase the workflow.
 
 Next up, there is a HTML-based UI with some JavaScript which I won't go into much detail on. The WebApp includes web3 and calls the `getAgreement` and `signAgreement` functions on the contract and fetches the balance for the user:
 
@@ -128,7 +130,7 @@ refreshbalance.addEventListener("click", function(event) {
 });
 ```
 
-The UI can also request new Agreements using a REST API on the server:
+The UI can also create new Agreements using a REST API on the server:
 
 ```javascript
 var agreementButton = document.getElementById("agreementButton");
@@ -173,7 +175,7 @@ if err != nil {
 }
 ```
 
-In this case, we use a hardcoded private key, which will also be supplied to testrpc to create an account. Then this key is converted to an `ECDS` and a `Transactor` is created, which is needed for doing transactions.
+In this case, we use a hardcoded private key, which will also be supplied to testrpc to create an account. Then this key is converted to an `ECDSA Private Key` and a `Transactor` is created, which is needed for doing transactions.
 
 We also use `Dial` to open a connection to the local `testrpc` instance. With the blockchain connection and credentials up and running, let's deploy the contract:
 
@@ -185,7 +187,7 @@ if err != nil {
 fmt.Println("Contract Deployed to: ", addr.String())
 ```
 
-Alright, now we setup the WebServer using [chi](https://github.com/go-chi/chi), with CORS headers set for convenience:
+Alright, now we can set up the WebServer using [chi](https://github.com/go-chi/chi), with CORS headers set for convenience:
 
 ```go
 r := chi.NewRouter()
@@ -204,9 +206,9 @@ log.Println("Server started on localhost:8080")
 log.Fatal(http.ListenAndServe(":8080", r))
 ```
 
-The only route we add here is `createAgreementHandler`. You might argue that it would have been perfectly ok to just use the go standard lib for this webserver and you would be totally right. The truth is, I thought this PoC would be more complex when I started out and I overprepared. ;)
+The only route we add here is `createAgreementHandler`. You might argue that it would have been perfectly ok to just use the go standard lib for this webserver and you would be totally right. The truth is, I thought this PoC would be more complex when I started out and I over prepared. ;)
 
-Ok, so the `POST` handler at `/agreement` is the only interaction between the Server and the User, so this is where all the magic happens. Let's go over it step-by-step:
+The `POST` handler at `/agreement` is the only interaction between the Server and the User, so this is where all the magic happens. Let's go over it step-by-step:
 
 ```go
 // Agreement is an agreement
@@ -236,7 +238,7 @@ func createAgreementHandler(contract *Signer, auth *bind.TransactOpts, conn *eth
     })
 ```
 
-First up, we need to handle the request. `chi` has a nice way of doing this with it's `render.Bind` function, which tries to bind the payload to a given json-struct. Then we validate that both the Account and Agreement are set and send back an error otherwise.
+First up, we need to handle the request. `chi` has a nice way of doing this with its `render.Bind` function, which tries to bind the payload to a given json-struct. Then we validate that both the Account and Agreement are set and send back an error otherwise.
 
 The next step is to create the Agreement on the smart-contract:
 
@@ -281,7 +283,6 @@ Here we just execute a normal transaction to the converted address of the User. 
 
 Essentially, we create a new transaction, sending `100000` wei to the User. Then we sign the transaction and send it. Afterwards, if everything went well, we return `200 OK`.
 
-
 That's it!
 
 The full code for the example can be found [here](https://github.com/zupzup/eth-prepaid-transaction)
@@ -292,11 +293,11 @@ The full code for the example can be found [here](https://github.com/zupzup/eth-
 
 The outlined concept won't work for a lot of applications, but for simple signing-use-cases, which are a good fit for blockchain platforms, it seems sufficient.
 
-The solution works pretty well and could, I believe, even serve as a basis for a real-world implementation of such a mechanism. Of course there need to be some serious precautions, or even a manual process for actually sending out transactions fees to arbitrary users, but the general concept works.
+The solution works well and could, I believe, even serve as a basis for a real-world implementation of such a mechanism. Of course, there need to be some serious precautions, or even a manual process for sending out transaction fees to arbitrary users, but the general concept seems sound.
 
-I'm curious how the blockchain space will deal with this issue in the future and which security and anti-fraud mechanisms will be provided by the platforms. What I am sure of today is that smart contract platforms will need mechanisms like this to shield users from the need to deal with cryptocurrency.
+I'm curious how the blockchain space will deal with this issue in the future and which security and anti-fraud mechanisms will be provided by the platforms. What I am sure of today is that smart contract platforms will need mechanisms like self-paying contracts to shield users from the need to deal with cryptocurrency.
 
-Please don't use this simplistic implementation for anything serious, as this will certainly end in tears, but maybe use it for inspiration or for learning in regards to the possibilities of interacting with the ethereum blockchain using Go. :)
+Please don't use this simplistic implementation for anything serious, as this will certainly end in tears, but maybe use it for inspiration or for learning in regards to the possibilities of interacting with the Ethereum blockchain using Go. :)
 
 #### Resources
 
