@@ -1,0 +1,10 @@
+title: Ethereum Prepaid Transactions with Go 
+short: "If ethereum or any other smart-contract platform is ever going to reach mainstream, a mechanism for people without holding cryptocurrency is needed. While there are efforts to achieve this in the future on ethereum, this post shows a workaround using a Go webserver."
+date: 19.10.2017
+tags:
+    - Go
+    - Golang
+    - ethereum 
+    - blockchain 
+    - transaction
+    - smart contracts
