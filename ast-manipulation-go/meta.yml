@@ -1,0 +1,8 @@
+
+title: Basic AST Manipulation in Go 
+short: "Traversing an ast (abstract syntax tree) is useful for analyzing and understanding a code-base, but the real power comes when we are able to manipulate it, which allows us to build tools. This post shows a simple example of how to manipulate the ast in Go."
+date: 10.11.2017
+tags:
+    - Go
+    - Golang
+    - ast 
