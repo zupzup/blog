@@ -129,6 +129,8 @@ This was another demonstration of how Go enables its users to write simple, yet 
 
 In the next couple of posts, I will show several other niceties I encountered while writing my first serious web application in Go, so stay tuned. ;)
 
+*// Edited the code after some feedback by `lstokeworth` on reddit. Thank you :)*
+
 #### Resources
 
 * [Full Code Example](https://github.com/zupzup/golang-http-file-upload-download)
