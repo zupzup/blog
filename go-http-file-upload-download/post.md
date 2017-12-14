@@ -13,7 +13,7 @@ Let's see how Go can solve this omnipresent problem of web engineering.
 First, we set up the web server with our two routes `/upload` for the File Upload and `/files/*` for the File Download.
 
 ```go
-const maxUploadSize = 2 * 1024 * 2014 // 2 MB 
+const maxUploadSize = 2 * 1024 // 2 MB 
 const uploadPath = "./tmp"
 
 func main() {
