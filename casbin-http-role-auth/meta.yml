@@ -1,0 +1,9 @@
+title: Basic Role-Based HTTP Authorization in Go with Casbin
+short: "Casbin is an authorization library for Go, which supports several access control models. In this post we will take a look at a simple HTTP example featuring basic role-based authorization."
+date: 05.01.2018
+tags:
+    - golang
+    - go
+    - auth
+    - http
+    - casbin
