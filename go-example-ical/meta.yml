@@ -1,0 +1,8 @@
+title: Creating an iCal feed with Go 
+short: "In this short example we'll create a cached iCal feed with Go for a fake REST API"
+date: 17.02.2018
+tags:
+    - golang
+    - go
+    - ical
+    - ics
