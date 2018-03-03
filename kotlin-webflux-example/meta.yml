@@ -1,0 +1,9 @@
+title: Playing around with Kotlin and Spring Webflux 
+short: "This post shows a small example of reactive web-programming in kotlin using the great new Spring Webflux framework."
+date: 03.03.2018
+tags:
+    - kotlin
+    - boot
+    - reactive
+    - webflux 
+    - spring
