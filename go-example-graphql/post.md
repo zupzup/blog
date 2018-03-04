@@ -1,20 +1,16 @@
-TBD
-graphql cool concept, especially with graph-like data
-versioning / versionless api through control over schema and queries
-[graphql](http://graphql.org/)
-[graphql-go](https://github.com/graphql-go/graphql)
-[graphql-go-handler](https://github.com/graphql-go/handler)
-[graphiql](https://github.com/graphql/graphiql)
-[jsonplaceholder](http://jsonplaceholder.typicode.com/)
+It seems like [GraphQL](http://graphql.org/) is being used more and more and having been present at some of the first public talks about it within the react ecosystem a couple of years back, I'm not surprised.
 
-example to wrap an existing API with a thin graphql layer as a first step to move to a graphql api
-wrap jsonplaceholder and convert some of it to be able to be queried by graphql
+The concept works out from several perspectives, with graph-like data, multiple distributed teams and highly versioned APIs as well as regarding type safety and documentation. GraphQL looks like a good fit for many different applications.
 
-## Example 
+This post's goal is not to introduce you the basics of GraphQL, but rather to see it in action in a realistic scenario. When planning to move an existing REST API to GraphQL, it makes sense to first introduce a translation-layer, to make a smooth transition.
 
-The goal is to fetch `posts` and `comments` from `jsonplaceholder` and end up with a way to fetch `posts` by ID and, if the API consumer wishes to also fetch the comments, to nest the comments into the `post`.
+In this post, we will use [jsonplaceholder](http://jsonplaceholder.typicode.com/) as the API we will wrap with GraphQL. There are a couple of libraries for graphQL in Go and for this example, [graphql-go](https://github.com/graphql-go/graphql) and [graphql-go-handler](https://github.com/graphql-go/handler) will be used.
 
-We define a `fetchPostByiD(id)` function, which calls `http://jsonplaceholder.typicode.com/posts/${id}` and transforms the resulting JSON to a `Post`. Of course, there is also a `fetchCommentsByPostID(post.ID)` helper function, whcih does the same for comments, by fetching the data from `http://jsonplaceholder.typicode.com/posts/${id}/comments` and transforming it to `[]Comment`.
+Our goal is to fetch `posts` and `comments` from `jsonplaceholder` and end up with a way to fetch `posts` by ID and, if the API consumer wishes to also fetch the comments, to nest the comments into the `post` via GraphQL.
+
+Let's get started.
+
+## Implementation
 
 First, we define data models for `Post` and `Comment`:
 
@@ -35,7 +31,9 @@ type Comment struct {
 }
 ```
 
-Then we go on to create our graphQL schema. We start by defining the `queryType`, which is the root of our schema.
+We also define a `fetchPostByiD(id)` function, which calls `http://jsonplaceholder.typicode.com/posts/${id}` and transforms the resulting JSON to a `Post`. Of course, there is also a `fetchCommentsByPostID(post.ID)` helper function, which does the same for comments, by fetching the data from `http://jsonplaceholder.typicode.com/posts/${id}/comments` and transforming it to `[]Comment`.
+
+Then we go on to create our graphQL schema. We start by defining the `queryType`, which is the root of our schema:
 
 ```go
 func createQueryType(postType *graphql.Object) graphql.ObjectConfig {
@@ -58,13 +56,13 @@ func createQueryType(postType *graphql.Object) graphql.ObjectConfig {
 }
 ```
 
-The root query type has only one field - the `post`. This field is defined by `postType`, which we will look at next and takes only one argument: `id`. Posts are resolved by taking the `id` from `p.Args` and passing it to `fetchPostsByID`, returning the fetched and transformed `posts` as well as any error.
+The root query type has only one field - the `post`. This field is defined by `postType`, which we will look at shortly. It takes only one argument called `id`.
 
-Next, we define the `postType`, which is a bit more interesting. We add a `comments` field with a custom resolver:
+Posts are resolved by taking the `id` from `p.Args` and passing it to `fetchPostsByID`, returning the fetched and transformed `Post` as well as any error.
 
-We map the `post` fields from data model to graphQL and  add the `comments` field. The `Resolve` function is only called, if the client explicitly wants to fetch `comments`. 
+Next, we define the `postType`, which is quite interesting. We basically just map the `post` fields from the data model to graphQL types, but we also add the `comments` field. The comment's `Resolve` function is only called, if the client explicitly wants to fetch them. 
 
-To resolve comments, we access the "parent" of this query by using `p.Source`, which yields us an instance of `*Post` - the fetched `post`. Using the `id` of this `post`, we can fetch the comments for it.
+To resolve comments, we access the "parent" of this query by using `p.Source`, which yields us an instance of `*Post` - the fetched `post`. Using the `id` of this `post`, we can fetch the comments for it:
 
 ```go
 func createPostType(commentType *graphql.Object) *graphql.Object {
@@ -125,7 +123,7 @@ func createCommentType() *graphql.Object {
 
 Alright, our schema is defined and the only thing left is to put it all together.
 
-We instantiate a `graphql` schema and pass it to `graphql-go-handler`, which is an http-middleware handling graphql-queries. Then, we simply start an `http` server with the returned handler routed to `/graphql`.
+We instantiate a `graphQL` schema and pass it to `graphql-go-handler`, which is an http-middleware which helps us to deal with graphQL queries. Then we simply start an `http` server with the returned handler routed to by `/graphql`.
 
 This is what it looks like:
 
@@ -141,7 +139,7 @@ func main() {
         ),
     })
     if err != nil {
-        log.Fatalf("failed to create new schema, error: %v", err)
+        log.Fatalf("failed to create schema, error: %v", err)
     }
     handler := gqlhandler.New(&gqlhandler.Config{
         Schema: &schema,
@@ -154,7 +152,7 @@ func main() {
 
 Alright, that's it!
 
-After starting the server, we can use `GraphiQL` to query for a post with a certain `id`, specifying the fields we are interested int:
+After starting the server, we can use [GraphiQL](https://github.com/graphql/graphiql) to query for a post with a certain `id`, specifying the fields we are interested in:
 
 ```
 query {
@@ -195,17 +193,17 @@ Resulting in the following response:
 }
 ```
 
-If we omit the `comments` from the query, the request to fetch the comments is never made and we simply get the selected post as a response.
+If we omit `comments` from the query, the request to fetch the comments is never made and we simply get the selected `post` as a response.
 
-The whole code for this example can be found [here](https://github.com/zupzup/example-go-graphql).
+The complete example code can be found [here](https://github.com/zupzup/example-go-graphql).
 
 ## Conclusion 
 
-TBD
-i'm sure there are nicer, more concise ways to create schema, but this is optimized for clarity
-graphql great
-`go-graphql` looks good and transferring knowledge from JS to Go worked well
-future post, hope to deal with graphql subscriptions
+This example showed how to transform an existing REST API to GraphQL using a thin Go layer. The library I used for this, `graphql-go` worked nicely, provided solid documentation and good examples to follow. Also, it closely mirrors the `graphql-js` API, which I was already familiar with, which made the conversion to Go a lot easier.
+
+There are surely more concise and fancier ways to define a schema such as this, but due to the introductory nature and my unfamiliarity with graphQL in Go I went for this solution, which is focused, above anything else, on clarity.
+
+GraphQL seems like it is here to stay and for good reason. I hope to be able to touch on GraphQL subscriptions in a future blog post, as well as some other, more advanced use-cases. :)
 
 #### Resources
 

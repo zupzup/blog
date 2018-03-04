@@ -1,5 +1,5 @@
-title: Creating a basic GraphQL API with Go 
-short: ""
+title: Creating a Basic GraphQL API with Go 
+short: "GraphQL is a powerful concept and this post will show how to translate an existing REST API to GraphQL using Go"
 date: 04.03.2018
 tags:
     - Golang
