@@ -127,11 +127,10 @@ class APIController(
         return apiService.fetchPosts()
                 .filter { it -> it.userId % 2 == 0 }
                 .take(20)
+                .parallel(4)
+                .runOn(Schedulers.parallel())
                 .map { post -> apiService.fetchComments(post.id)
-                        .parallel(4)
-                        .runOn(Schedulers.parallel())
                         .map { comment -> LightComment(email = comment.email, body = comment.body) }
-                        .sequential()
                         .collectList()
                         .zipWith(post.toMono()) }
 
@@ -142,6 +141,7 @@ class APIController(
                         title = result.t2.title,
                         comments = result.t1
                 ) }
+                .sequential()
                 .collectList()
                 .map { body -> ResponseEntity.ok().body(body) }
                 .toMono()
@@ -153,9 +153,11 @@ Ok, quite a few things are happening here and if you're not used to functional p
 
 We start off by fetching the `posts` using our injected `apiService`. Then we `filter` this reactive stream of `post` elements, using only `posts` with even ids and taking only the first 20 elements (`take(20)`). So far, so good.
 
-Then, we `map` the `posts` to another reactive sequence. In this new sequence, we call `fetchComments` with the given `post.id` to fetch a post's comments. The goal is to map these `comments` to `LightComment`, throwing away some of the data we don't want to display and to `zip` them up with the `post` data, so we can create the above mentioned data structure later on.
+To fetch the comments with explicit parallelism of `4`, we add `.parallel(4) and .runOn(Schedulers.parallel())` to the stream. Later on, we have to call `.sequential()` again to wait for all the values fetched in parallel, otherwise we couldn't stuff them together in a List, which we need to be able to `zip` the `comments` with the `post`.
 
-To do all this in parallel, we add `.parallel(4) and .runOn(Schedulers.parallel())` to the stream. Later on, we have to call `.sequential()` again to wait for all the values fetched in parallel, otherwise we couldn't stuff them together in a List, which we need to be able to `zip` the `comments` with the `post`.
+Just to be clear, the `parallel(4)` is not necessary to fetch the comments concurrently, but rather explicitly controls the parallelism of the concurrent and asynchronous processing. As [@hpgrahsl](https://twitter.com/hpgrahsl) pointed out to me on twitter, the idiomatic, recommended way for this use-case would be to just use `flatMap`.
+
+In any case, the next step is to `map` the `posts` to another reactive sequence. In this new sequence, we call `fetchComments` with the given `post.id` to fetch a post's comments. The goal is to map these `comments` to `LightComment`, throwing away some of the data we don't want to display and to `zip` them up with the `post` data, so we can create the above mentioned data structure later on.
 
 Now we have a sequence of `Tuple2<List<LightComment, Post>>` from the `zipWith` operation. We use `flatMap` to convert the stream from a sequence of `Monos` to a sequence of just our zipped data, which we then simply `map` to the `Response` model.
 
@@ -172,6 +174,8 @@ Reactive programming, when you're used to the style, can be a lot of fun. There 
 There are some downsides to this asynchronous, non-blocking, stream-transforming way of coding like that it's inherently hard to test and debug and that there is a bit of a learning-curve at first, but for the right use-cases the benefits outweigh them in my opinion.
 
 It's been a while since I used Spring Boot or Spring in general and I'm impressed by the progress which happened in the meantime. Webflux, especially with Kotlin, looks like something I will strongly consider for a future service. :)
+
+*Thanks to [@hpgrahsl](https://twitter.com/hpgrahsl) for the invaluable feedback regarding the use of `parallel` and `flatMap`.*
 
 #### Resources
 
