@@ -1,0 +1,10 @@
+title: WebSockets with Kotlin and Webflux 
+short: "This post shows a small example of a Kotlin Webflux application handling WebSockets communication."
+date: 17.03.2018
+tags:
+    - kotlin
+    - websockets
+    - boot
+    - reactive
+    - webflux 
+    - spring
