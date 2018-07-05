@@ -1,4 +1,4 @@
-title: Elasticsearch to Prometheus Exporter in GO 
+title: Elasticsearch to Prometheus Exporter in Go 
 short: "This post describes how to create a server in Go, which provides data from Elasticsearch for Prometheus to consume."
 date: 05.07.2018
 tags:
