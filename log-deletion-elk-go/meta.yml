@@ -1,0 +1,7 @@
+title: Log Deletion on ELK stack using Go 
+short: "This post will show a simple script for deleting old logs on the ELK stack written in Go."
+date: 15.09.2018
+tags:
+    - Go
+    - Golang
+    - ELK 
