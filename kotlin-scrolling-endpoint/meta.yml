@@ -1,0 +1,8 @@
+title: Scrolling Endpoint with Kotlin and Spring Boot 
+short: "In order to fetch huge amounts of data in a sane way, it often makes sense to scroll through the data instead of requesting it all at once. In this post, we will create a simple implementation of such a mechanism using Kotlin and Spring Boot 2."
+date: 16.09.2018
+tags:
+    - kotlin
+    - spring-boot
+    - web 
+    - scrolling 
