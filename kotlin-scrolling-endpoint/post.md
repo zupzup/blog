@@ -109,6 +109,8 @@ The first one is simply a wrapper for the result, to keep a clean separation bet
 
 For more advanced use-cases, this request object could also include some request parameters for filtering the list. With this, the client would only need to provide these filters at the initial request, but for the rest of the requests, the `scrollParam` would suffice.
 
+It's important to use the `ID` of the last data point the client received and not just to count up, because intermittent changes to the data set could lead to the order of entries being wrong as well as to duplicates.
+
 Before we get into the service methods, some setup needs to happen. In order to efficiently keep the scrolling state (if necessary across several instances of our application), we will put it into a shared cache.
 
 ```java
