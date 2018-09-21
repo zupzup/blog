@@ -82,8 +82,7 @@ class ScrollingController(
                             users = result.users
                         ))
         } catch (e: UserScrollParamNotFoundInCacheException) {
-            return createError("You must provide an active scrollParam,
-                the scrollParam `$scrollParam` does not exist")
+            return createError("You must provide an active scrollParam, the scrollParam `$scrollParam` does not exist")
         }
     }
 }

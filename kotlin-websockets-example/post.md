@@ -62,7 +62,7 @@ Now on the server, we use a generated template from the [Spring Initializr](http
 
 First, we define a data model for an Event.
 
-```java
+```kotlin
 data class Event(val sender: Int, val value: Int)
 ```
 
@@ -70,7 +70,7 @@ Then we move on to define the `WebSocketHandler`. Our goal is, to `receive` data
 
 I'm certain there are several (and likely more elegant) ways of achieving this, but in this example I opted to use a shared [TopicProcessor](https://projectreactor.io/docs/core/snapshot/api/reactor/core/publisher/TopicProcessor.html), which enables us to pass messages asynchronously from multiple threads. 
 
-```java
+```kotlin
 @Component
 class PrimeNumbersHandler : WebSocketHandler {
     private val processor = TopicProcessor.share<Event>("shared", 1024)
@@ -78,7 +78,7 @@ class PrimeNumbersHandler : WebSocketHandler {
 
 If a client connects, we `handle` it as follows:
 
-```java
+```kotlin
 override fun handle(session: WebSocketSession): Mono<Void> {
     return session.send(
             processor
@@ -90,7 +90,7 @@ The snippet above means that, whenever there is a new value in the shared `proce
 
 We also need to define a handler for receiving data from the client:
 
-```java
+```kotlin
 .and(
     session.receive()
             .map { ev ->
@@ -108,7 +108,7 @@ I used the `isPrime` function from [this post](https://stackoverflow.com/questio
 
 The only thing left to do is wiring the handler up to our Webflux application. For this, we create a `WebSocketHandlerAdapter` and a `handlerMapping` with the `/ws/primes` route pointing to our `PrimeNumbersHandler`:
 
-```java
+```kotlin
 @Configuration
 @EnableWebFlux
 @ComponentScan(value = ["org.zupzup.kotlinwebfluxdemo"])
