@@ -14,7 +14,7 @@ Let's get started.
 
 First, let's create a new Spring Boot application at [https://start.spring.io/](https://start.spring.io/) selecting the `Reactive Web` dependency. With this application template, we can start our implementation by configuring the Spring Boot application to be a `reactive` web application:
 
-```java
+```kotlin
 @SpringBootApplication
 class KotlinWebfluxDemoApplication
 
@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
 
 And we also create a `WebConfig` class, which adds `cors` mappings, has the `@EnableWebFlux` annotation and sets up our dependency injection config.
 
-```java
+```kotlin
 @Configuration
 @EnableWebFlux
 @ComponentScan("org.zupzup.kotlinwebfluxdemo")
@@ -42,7 +42,7 @@ With the boilerplate out of the way, let's create some data models. Kotlin provi
 
 In this example, we will need a `Post` and `Comment` for the data source and a `Response` class for our transformed response:
 
-```java
+```kotlin
 data class Comment(
         val postId: Int,
         val id: Int,
@@ -75,7 +75,7 @@ In order to fetch data from `jsonplaceholder`, we create an `APIService`, which 
 
 This is quite nice, as it enables us to easily transform our responses to a `Flux` or `Mono` of the model represented by the returned JSON.
 
-```java
+```kotlin
 @Service
 class APIService {
     fun fetchComments(postId: Int): Flux<Comment> = fetch("posts/$postId/comments").bodyToFlux(Comment::class.java)
@@ -106,17 +106,15 @@ The goal is to fetch 20 `posts` with an even `id` from `jsonplaceholder` and the
             {
                 "email": "...",
                 "body": "..."
-            },
-            ...
+            }
         ]
-    },
-    ...
+    }
 ]
 ```
 
 Let's see how that works:
 
-```java
+```kotlin
 @RestController
 @RequestMapping(path = ["/api"], produces = [ APPLICATION_JSON_UTF8_VALUE ])
 class APIController(

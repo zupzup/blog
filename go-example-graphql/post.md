@@ -185,8 +185,7 @@ Resulting in the following response:
           "id": 21,
           "email": "...",
           "name": "..."
-        },
-        ...
+        }
       ]
     }
   }

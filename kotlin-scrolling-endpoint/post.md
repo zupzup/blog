@@ -19,7 +19,7 @@ curl localhost:8080/rest/v1/user/scroll
 This will trigger the following response (with a random UUID of course):
 
 ```json
-{"data":{"scrollParam":"94422391-b626-4926-aca9-cc7ae4e6f3a5","users":[...]}}
+{"data":{"scrollParam":"94422391-b626-4926-aca9-cc7ae4e6f3a5","users":[]}}
 ```
 
 We get some data already from the first request and, more importantly, the `scrollParam`, which is a unique ID identifying our scrolling-state on the backend.
@@ -52,7 +52,7 @@ The Spring Boot boilerplate will be omitted here for brevity, but the full code 
 
 Ok, first up, the data model for the users:
 
-```java
+```kotlin
 data class User (
     val id: Int,
     val firstName: String,
@@ -63,7 +63,7 @@ data class User (
 
 With that out of the way, let's look at the definition of our controller. It waits for requests at `GET /rest/v1/user/scroll`:
 
-```java
+```kotlin
 @RestController
 @RequestMapping("rest/v1/user")
 class ScrollingController(
@@ -93,7 +93,7 @@ There is an optional `scrollParam` parameter. Remember when discussing the usage
 
 The endpoint calls the `scrollUsers` method in the `userService`, which is the core part of the mechanism. For the service layer, we need two data classes as well:
 
-```java
+```kotlin
 data class UserScrollingResult(
     var scrollParam: String,
     var users: List<User>
@@ -113,7 +113,7 @@ It's important to use the `ID` of the last data point the client received and no
 
 Before we get into the service methods, some setup needs to happen. In order to efficiently keep the scrolling state (if necessary across several instances of our application), we will put it into a shared cache.
 
-```java
+```kotlin
 @Service
 class UserService {
     private val listOfUsers: List<User> = initializeUserList()
@@ -143,7 +143,7 @@ After the cache initialization, we also initialize our randomly generated list o
 
 With all the setup out of the way, let's get to the interesting stuff. The `scrollUsers` service method encapsulates the whole mechanism for saving, updating and evicting scrolling state as well as for creating the `UserScrollingResult`:
 
-```java
+```kotlin
 fun scrollUsers(scrollParam: String?): UserScrollingResult {
     val scrollRequest: UserScrollRequest
     val activeScrollParam = scrollParam ?: UUID.randomUUID().toString()
@@ -166,7 +166,7 @@ Alright, plenty of things happen in the above snippet. First, if we get passed a
 
 If the `scrollParam` was not provided, we create a new scrolling State and put it in the cache, otherwise we fetch the existing scrolling state for the given `scrollParam` from the cache:
 
-```java
+```kotlin
 private fun putUserScrollRequestInCache(
         scrollParam: String
 ): UserScrollRequest {
@@ -193,7 +193,7 @@ Then, with our scrolling state, we fetch the users with the current `cursor`. No
 
 If it is not, we simply update the scrolling state with the new cursor:
 
-```java
+```kotlin
 private fun updateUserScrollRequestCursorInCache(scrollParam: String, cursor: Int): UserScrollRequest? {
     val value = cacheManager.getCache(CACHE_KEY_SCROLLING)!!.get(scrollParam)
     if (value == null || value.get() !is UserScrollRequest) {
@@ -213,7 +213,7 @@ After all that, the only thing left is to return a `UserScrollResult` with the `
 
 Actually fetching the users, in this contrived case, is just a bit of cursor-counting in our randomly generated user list:
 
-```java
+```kotlin
 private fun fetchUsers(cursor: Int): List<User> {
     val result = ArrayList<User>()
     if (cursor > listOfUsers.size) return result
