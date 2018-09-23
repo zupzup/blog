@@ -1,0 +1,9 @@
+title: Syntax-Highlighting from a Markdown source in Go using Chroma 
+short: "This post shows how to create syntax-highlighted HTML from a markdown source using the chroma Go library."
+date: 23.09.2018
+tags:
+    - golang
+    - go
+    - syntax-highlighting
+    - markdown
+    - chroma
