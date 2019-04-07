@@ -1,0 +1,8 @@
+title: A Basic Webapp with Rust and Actix-web
+short: "As a first little project in Rust I thought I'd do something familiar and created a small webservice."
+date: 07.04.2019
+tags:
+    - rust
+    - actix
+    - web
+    - timeular
