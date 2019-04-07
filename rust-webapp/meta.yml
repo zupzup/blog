@@ -1,5 +1,5 @@
-title: A Basic Webapp with Rust and Actix-web
-short: "As a first little project in Rust I thought I'd do something familiar and created a small webservice."
+title: A Basic Web Application with Rust and Actix-web
+short: "As a first little project in Rust I thought I'd do something familiar, so I created a small web application, which we'll check out in this post."
 date: 07.04.2019
 tags:
     - rust
