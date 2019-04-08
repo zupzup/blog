@@ -1,3 +1,5 @@
+*This post and example were based on Actix 0.7*
+
 I've been playing around with Rust quite a bit for the last several months and I have been loving it.
 
 There is definitely a rather steep learning curve compared to learning other languages, but when it clicks and something compiles, it tends to work well in my experience so far, which is very rewarding.
