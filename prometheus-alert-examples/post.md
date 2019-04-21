@@ -14,31 +14,31 @@ To start off, we'll look at some basic infrastructure alerts, regarding CPU/memo
 
 To signal, that a target (e.g. instance) is down, we simply check the `up` metric:
 
-```yml
+```bash
 expr: up == 0
 ```
 
 To signal, that a disk will fill up soon, based on a trend of the last x hours, we use the `predict_linear` function. This alert triggers, if based on data during the last 24 hours, the available disk space will go below zero in the next 7 days:
 
-```yml
+```bash
 expr: predict_linear(node_filesystem_avail[24h], 7*24*3600) <= 0
 ```
 
 To signal, that memory will be full in a certain timeframe based on a trend of the last x hours, we also use `predict_linear`. This alert will trigger, if the memory increase based on the last two hours, will result in the memory running out within the next hour:
 
-```yml
+```bash
 expr: predict_linear(node_memory_MemAvailable[2h], 1*3600) <= 0
 ```
 
 To signal high memory pressure, we first calculate the percentage of available memory, and if that's as low as 5% and the rate of page faults during the last minute was high (>100), we trigger an alert:
 
-```yml
+```bash
 expr: (node_memory_MemAvailable /  node_memory_MemTotal * 100) < 5 and rate(node_vmstat_pgmajfault[1m]) > 100
 ```
 
 To signal high CPU usage, we simply divide the load average of the last 5 minutes by the amount of cpus on that instance, and if it's above 95% for some time, we alert:
 
-```yml
+```bash
 expr: node_load5/count(node_cpu{mode="idle"}) without (cpu,mode) >= 0.95
 ```
 
@@ -52,7 +52,7 @@ In order to be able to combine this on the `pod` metric, we need to replace the 
 
 And if the pod is `running`, but not `up` (i.e. reachable), then we trigger an alert:
 
-```yml
+```bash
 expr: kube_pod_container_status_running == 1 
     and on(pod) label_replace(
         up{kubernetes_container_name=~".+"}, "pod", "$1", "kubernetes_pod_name", "(.*)"
@@ -61,27 +61,27 @@ expr: kube_pod_container_status_running == 1
 
 To signal, that one, or many pods of a type are unreachable, we test if the existing replicas of a kubernetes `deployment`, are smaller than the amount of expected replicas:
 
-```yml
+```bash
 expr: kube_deployment_status_replicas > kube_deployment_status_replicas_available
 ```
 
 To signal, that all pods of a type are unreachable, we basically do the same as above, but we test, that no replicas are actually available, which means that the service can not be reached:
 
-```yml
+```bash
 expr: kube_deployment_status_replicas > 0 
     and kube_deployment_status_replicas_available == 0
 ```
 
 To signal, that a pod was restarted, we check only pods, that have been terminated and we calculate the rate of restarts during the last 5 minutes, to notice, even if the pod was restarted between prometheus polls, that it happened:
 
-```yml
+```bash
 expr: kube_pod_container_status_last_terminated_reason == 1 
     and on(container) rate(kube_pod_container_status_restarts_total[5m]) * 300 > 1
 ```
 
 To signal, that a pod is likely having an issue to start up, we check if a pod is in `waiting` state, but not with the reason `ContainerCreating`, which would just mean that it's starting up:
 
-```yml
+```bash
 expr: kube_pod_container_status_waiting_reason{reason!="ContainerCreating"} == 1
 ```
 
@@ -92,13 +92,13 @@ The following two alerts are based on a custom counter, counting http response s
 
 To signal an increase in 5xx errors, we simply use the `increase` function on the counter and compare it with a threshold over a given amount of time (1m in this case). This could also be done with `4xx` errors. In our case, all 5xx errors are categorized with the `type` 500:
 
-```yml
+```bash
 expr: increase(gateway_status_code{type="500"}[1m]) > 50 
 ```
 
 To signal a spike in response-time, we can use the `quantile` label within the created prometheus summary and compare the quantiles with fixed values. The actual values and limits for alerting will greatly depend on the actual healthy response-times of the system:
 
-```yml
+```bash
 expr: gateway_response_time{quantile="0.5"} > 0.1 
     or gateway_response_time{quantile="0.9"} > 0.5 
     or gateway_response_time{quantile="0.99"} > 1.0
@@ -112,7 +112,7 @@ This alert relies on [Blackbox-Exporter](https://github.com/prometheus/blackbox_
 
 So to check, if a url could not be reached, you could use the following:
 
-```yml
+```bash
 expr: probe_success == 0 
 ```
 
