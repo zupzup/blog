@@ -1,0 +1,7 @@
+title: Examples for Prometheus Alerts
+short: "These are some of the prometheus alerts which have been useful in my (limited) experience."
+date: 19.04.2019
+tags:
+    - prometheus
+    - ops
+    - alerts 
