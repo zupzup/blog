@@ -1,0 +1,7 @@
+title: RabbitMQ Cluster Configuration for Kubernetes 
+short: "This is an example configuration of a RabbitMQ cluster running in Kubernetes"
+date: 22.05.2019
+tags:
+    - rabbitmq
+    - kubernetes
+    - cluster
