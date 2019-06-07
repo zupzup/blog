@@ -1,0 +1,7 @@
+title: Asyncifying an Actix Web App 
+short: "TBD"
+date: 01.06.2010
+tags:
+    - Rust
+    - Actix
+    - Futures
