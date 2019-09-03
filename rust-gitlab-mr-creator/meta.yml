@@ -1,6 +1,6 @@
 title: A CLI Gitlab MR-Creator in Rust using Hyper and Git2
 short: "This post showcases a small CLI tool written in Rust using both synchronous and asynchronous execution flow."
-date: 04.09.2019
+date: 03.09.2019
 tags:
     - Rust
     - Gitlab
