@@ -16,7 +16,7 @@ The first part we'll touch is the `http` module, which houses our API requests t
 
 Before we move over the first module, we need to update dependencies. As mentioned above, right now the whole ecosystem is basically in `alpha` mode before async/await is stabilized, so we use the latest alphas at this point:
 
-```toml
+```bash
 hyper = { version = "0.13.0-a.4", features = ["unstable-stream"]}
 hyper-tls = { version = "0.4.0-a.4" }
 tokio = { version = "=0.2.0-alpha.6" }
