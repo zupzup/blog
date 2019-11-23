@@ -1,0 +1,7 @@
+title: Async-Awaitifying a Rust CLI App 
+short: "In a previous post I showed an example CLI application in rust dealing with HTTP and Git. This post will show how to use the new async/await syntax to improve it."
+date: 23.11.2019
+tags:
+    - Rust
+    - Async
+    - Futures
