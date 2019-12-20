@@ -14,7 +14,7 @@ This unending hunger for users' personal data, paired with a business model reli
 
 The third part, Minimal Footprint in this case means that, in terms of performance, the whole blog should, in terms of byte size, be as small as possible.
 
-And just to be clear, I'm not talking about less than 1MB here, I'm talking about fitting the whole frontpage within 10KB. This is rather specific, but the more general goal would be to make the page as small as possible, reducing all unnecessary stuff, improving every reader's experience in the process.
+And just to be clear, I'm not talking about less than 1MB here, I'm talking about fitting the whole front page within 10KB. This is rather specific, but the more general goal would be to make the page as small as possible, reducing all unnecessary stuff, improving every reader's experience in the process.
 
 We'll talk about the Why and the How of making this happen for a website. This will not be an especially technical, or exhaustive description of what to do, but more a write-up of the reasoning and some direction for people interested in going down the same road.
 
@@ -38,11 +38,11 @@ An added benefit is, that even for users with good internet connections, the pag
 
 ## The How
 
-Well, not including any ads, or trackers is actually pretty easy - just don't do it. ;) In fact, my blog doesn't include a single line of JavaScript, which helps with page size as well. The only "tracking" information I'im interested in, is how many people read a post relative to others.
+Well, not including any ads, or trackers is actually pretty easy - just don't do it. ;) In fact, my blog doesn't include a single line of JavaScript, which helps with page size as well. The only "tracking" information I'm interested in, is how many people read a post relative to others.
 
-And I also don't care as much about the exact number, but rather about what people like to read / find on the web related to my other posts. For this purpose, the server log of whereever the blog is hosted should be sufficient.
+And I also don't care as much about the exact number, but rather about what people like to read / find on the web related to my other posts. For this purpose, the server log of wher ever the blog is hosted should be sufficient.
 
-Getting down the request size is a bit more challenging, but also not particularly difficult. The first step is to reduce the amount of images on the frontpage to a minimum. A small logo and icons, optimally svg, are fine, but everything above that will make it hard to stay under the limit.
+Getting down the request size is a bit more challenging, but also not particularly difficult. The first step is to reduce the amount of images on the front page to a minimum. A small logo and icons, optimally svg, are fine, but everything above that will make it hard to stay under the limit.
 
 No JavaScript also helps, but might be hard to achieve depending on the content you create. For me, I write primarily posts with code-snippets and very rarely an image, so I don't need any JS on the site. Should you need JavaScript for the kind of content you're creating, make sure it's a minified and minimal version of what you need. Try not to include third-party scripts, if you include JavaScript it should be small enough to inline it in the page.
 
@@ -52,5 +52,5 @@ In any case, everything you send down the wire should be compressed (e.g. gzippe
 
 In this post I attempted to explain my reasoning  behind creating a blog, which loads the minimal amount of data from the network, isn't plastered with ads and respects the privacy of it's readers.
 
-The web is a beautiful thing and has enriched my life in so many ways, I believe that the current situation with unnecesarrily bloated websites, which try to extract as much personal and behavioral data from users as possible in order to blast them with "better" advertising is not a sustainable model.
+The web is a beautiful thing and has enriched my life in so many ways, I believe that the current situation with unnecessarily bloated websites, which try to extract as much personal and behavioral data from users as possible in order to blast them with "better" advertising is not a sustainable model.
 
