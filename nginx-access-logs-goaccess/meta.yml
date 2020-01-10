@@ -1,0 +1,8 @@
+title: Minimal Nginx Access Log Analysis
+short: "This post shows my minimal setup for analyzing the logs of this Blog using GoAccess and some unix commands."
+date: 10.01.2020
+tags:
+    - nginx
+    - logs
+    - linux
+    - goaccess
