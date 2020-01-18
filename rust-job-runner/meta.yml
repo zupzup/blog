@@ -1,8 +1,9 @@
 title: Synchronized Asynchronous Job Runner in Rust 
-short: "In this post we'll implement a basic asynchronous job runner, which synchronizes job runs among several clients using Redis."
-date: 15.01.2020
+short: "In this post we'll implement a basic asynchronous job runner, which synchronizes job runs among several instances using Redis."
+date: 18.01.2020
 tags:
     - Rust
     - Async
     - job
     - runner
+    - web
