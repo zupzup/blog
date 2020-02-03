@@ -1,6 +1,6 @@
 title: Rust HTTP Testing with Mockito 
 short: "In this post we'll be taking a look at the mockito rust library for mocking HTTP requests in order to write integration tests for a web-service"
-date: 18.02.2020
+date: 03.02.2020
 tags:
     - Rust
     - http
