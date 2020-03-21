@@ -1,0 +1,9 @@
+title: JIRA OAuth 1.0a using Rust 
+short: "In this post we'll look at how a very basic OAuth 1.0a implementation can look like in Rust."
+date: 21.03.2020
+tags:
+    - rust
+    - oauth
+    - jira
+    - rsa
+    - sha1
