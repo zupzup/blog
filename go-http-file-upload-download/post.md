@@ -46,7 +46,8 @@ First, we define the handler:
 func uploadFileHandler() http.HandlerFunc {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 ```
-Thanks to [Luis Villegas](https://github.com/luisguve) for an improved solution here:
+
+*Big Thanks to [Luis Villegas](https://github.com/luisguve) for an improved solution here, where we check the file size using the file header, instead of the whole request.*
 
 Then, we parse the multipart/form-data in the request body by calling ParseMultiPartForm on the request object and passing to it the maxUploadSize constant as a parameter.
 
@@ -55,11 +56,11 @@ Any errors returned from this method should count as an internal server error, s
 Errors are handled with a simple renderError helper, which returns the given error message and an according HTTP status code.
 
 ```go
-    if err := r.ParseMultipartForm(maxUploadSize); err != nil {
-        fmt.Printf("Could not parse multipart form: %v\n", err)
-        renderError(w, "CANT_PARSE_FORM", http.StatusInternalServerError)
-        return
-    }
+if err := r.ParseMultipartForm(maxUploadSize); err != nil {
+    fmt.Printf("Could not parse multipart form: %v\n", err)
+    renderError(w, "CANT_PARSE_FORM", http.StatusInternalServerError)
+    return
+}
 ```
 
 If the request could be parsed successfully, we will check and parse the form parameters `type` and `uploadFile` and read the file:
@@ -89,11 +90,11 @@ if fileSize > maxUploadSize {
 In this example, for clarity, we won't use any fanciness with the great `io.Reader` and `io.Writer` interfaces, but simply read the file into a byte array, which we will later write out again.
 
 ```go
-    fileBytes, err := ioutil.ReadAll(file)
-    if err != nil {
-        renderError(w, "INVALID_FILE", http.StatusBadRequest)
-        return
-    }
+fileBytes, err := ioutil.ReadAll(file)
+if err != nil {
+    renderError(w, "INVALID_FILE", http.StatusBadRequest)
+    return
+}
 ```
 
 Now that we successfully validated and read the file, it's time to check the file type. A cheap and rather insecure way of doing this, would be to just check the file extension and trust the user didn't change it, but that just won't do for a serious application.
@@ -101,26 +102,26 @@ Now that we successfully validated and read the file, it's time to check the fil
 Gladly, the Go standard library provides us with the `http.DetectContentType` function, which only needs the first 512 bytes of the file to detect its file type based on the `mimesniff` algorithm.
 
 ```go
-    filetype := http.DetectContentType(fileBytes)
-    if filetype != "image/jpeg" && filetype != "image/jpg" &&
-        filetype != "image/gif" && filetype != "image/png" &&
-        filetype != "application/pdf" {
-        renderError(w, "INVALID_FILE_TYPE", http.StatusBadRequest)
-        return
-    }
+filetype := http.DetectContentType(fileBytes)
+if filetype != "image/jpeg" && filetype != "image/jpg" &&
+    filetype != "image/gif" && filetype != "image/png" &&
+    filetype != "application/pdf" {
+    renderError(w, "INVALID_FILE_TYPE", http.StatusBadRequest)
+    return
+}
 ```
 
 In a real-world application, we would probably do something with the file metadata, such as saving it to a database or pushing it to an external service - in any way, we would parse and manipulate metadata. Here we create a randomized new name (this would probably be a UUID in practice) and log the future filename.
 
 ```go
-    fileName := randToken(12)
-    fileEndings, err := mime.ExtensionsByType(fileType)
-    if err != nil {
-        renderError(w, "CANT_READ_FILE_TYPE", http.StatusInternalServerError)
-        return
-    }
-    newPath := filepath.Join(uploadPath, fileName+fileEndings[0])
-    fmt.Printf("FileType: %s, File: %s\n", fileType, newPath)
+fileName := randToken(12)
+fileEndings, err := mime.ExtensionsByType(fileType)
+if err != nil {
+    renderError(w, "CANT_READ_FILE_TYPE", http.StatusInternalServerError)
+    return
+}
+newPath := filepath.Join(uploadPath, fileName+fileEndings[0])
+fmt.Printf("FileType: %s, File: %s\n", fileType, newPath)
 ```
 
 Almost done - just one very important step left - writing the file. As mentioned above, we simply copy the byte array we got from reading the file to a newly created file handler called `newFile`.
@@ -128,17 +129,17 @@ Almost done - just one very important step left - writing the file. As mentioned
 If everything went well, we return a `SUCCESS` message to the user.
 
 ```go
-    newFile, err := os.Create(newPath)
-    if err != nil {
-        renderError(w, "CANT_WRITE_FILE", http.StatusInternalServerError)
-        return
-    }
-    defer newFile.Close()
-    if _, err := newFile.Write(fileBytes); err != nil {
-        renderError(w, "CANT_WRITE_FILE", http.StatusInternalServerError)
-        return
-    }
-    w.Write([]byte("SUCCESS"))
+newFile, err := os.Create(newPath)
+if err != nil {
+    renderError(w, "CANT_WRITE_FILE", http.StatusInternalServerError)
+    return
+}
+defer newFile.Close()
+if _, err := newFile.Write(fileBytes); err != nil {
+    renderError(w, "CANT_WRITE_FILE", http.StatusInternalServerError)
+    return
+}
+w.Write([]byte("SUCCESS"))
 ```
 
 That's it. You can test this simple example with a dummy file-upload HTML page, cURL or a nice tool like [postman](https://www.getpostman.com/).
@@ -152,6 +153,8 @@ This was another demonstration of how Go enables its users to write simple, yet 
 In the next couple of posts, I will show several other niceties I encountered while writing my first serious web application in Go, so stay tuned. ;)
 
 *// Edited the code after some feedback by `lstokeworth` on reddit. Thank you :)*
+
+*// Edited the code and text after a merge request by [Luis Villegas](https://github.com/luisguve) on GitHub. Thank you :)*
 
 #### Resources
 
