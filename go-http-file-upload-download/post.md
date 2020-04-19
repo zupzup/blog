@@ -46,27 +46,49 @@ First, we define the handler:
 func uploadFileHandler() http.HandlerFunc {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 ```
+Thanks to [Luis Villegas](https://github.com/luisguve) for an improved solution here:
 
-Then, we validate the file size using the `http.MaxBytesReader`, which will return an error when used with a bigger file than the configured max size. Errors are handled with a simple `renderError` helper, which returns the given error message and an according HTTP status code.
+Then, we parse the multipart/form-data in the request body by calling ParseMultiPartForm on the request object and passing to it the maxUploadSize constant as a parameter.
+
+The whole request body is parsed and up to a total of the given amount of bytes of its file parts are stored in memory, with the remainder stored on disk in temporary files.
+Any errors returned from this method should count as an internal server error, so we check that case and return the aproppiate error message and status code.
+Errors are handled with a simple renderError helper, which returns the given error message and an according HTTP status code.
 
 ```go
-    r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
     if err := r.ParseMultipartForm(maxUploadSize); err != nil {
-        renderError(w, "FILE_TOO_BIG", http.StatusBadRequest)
+        fmt.Printf("Could not parse multipart form: %v\n", err)
+        renderError(w, "CANT_PARSE_FORM", http.StatusInternalServerError)
         return
     }
 ```
 
-If the file-size is ok, we will check and parse the form parameter `type` and the `uploadFile` and read the file. In this example, for clarity, we won't use any fanciness with the great `io.Reader` and `io.Writer` interfaces, but simply read the file into a byte array, which we will later write out again.
+If the request could be parsed successfully, we will check and parse the form parameters `type` and `uploadFile` and read the file:
 
 ```go
-    fileType := r.PostFormValue("type")
-    file, _, err := r.FormFile("uploadFile")
+fileType := r.PostFormValue("type")
+file, fileheader, err := r.FormFile("uploadFile")
     if err != nil {
         renderError(w, "INVALID_FILE", http.StatusBadRequest)
         return
-    }
-    defer file.Close()
+}
+defer file.Close()
+```
+
+Then, we validate the file size comparing `maxUploadSize` and the `Size` field of the header returned by `r.FormFile`. For debugging purposes, we'll print out the file size in the console as well.
+If the file size is greater than `maxUploadSize`, then we will send a `FILE_TOO_BIG` error to the client, along with a StatusBadRequest code.
+
+```go
+fileSize := fileHeader.Size
+fmt.Printf("File size (bytes): %v\n", fileSize)
+if fileSize > maxUploadSize {
+	renderError(w, "FILE_TOO_BIG", http.StatusBadRequest)
+	return
+}
+```
+
+In this example, for clarity, we won't use any fanciness with the great `io.Reader` and `io.Writer` interfaces, but simply read the file into a byte array, which we will later write out again.
+
+```go
     fileBytes, err := ioutil.ReadAll(file)
     if err != nil {
         renderError(w, "INVALID_FILE", http.StatusBadRequest)
