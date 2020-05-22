@@ -1,0 +1,9 @@
+title: Database Migrations with a Rust Web Service
+short: "In this post we'll look at the refinery library and at how it can help us create automatic database migrations in a Rust Web Service"
+date: 22.05.2020
+tags:
+    - rust
+    - database
+    - migration
+    - refinery
+    - warp
