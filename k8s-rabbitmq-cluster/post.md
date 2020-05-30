@@ -11,7 +11,7 @@ First, we will go over the configuration for rabbitmq. In this case, we will sim
 As a base-image, we use the official [RabbitMQ Docker Image](https://hub.docker.com/_/rabbitmq/) and copy in our own `rabbitmq.conf` and `enabled_plugins` files.
 
 ```bash
-FROM rabbitmq:3.7.8
+FROM rabbitmq:3.8.4
 
 ADD rabbitmq.conf /etc/rabbitmq
 ADD enabled_plugins /etc/rabbitmq
