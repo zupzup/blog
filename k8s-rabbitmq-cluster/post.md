@@ -198,22 +198,31 @@ spec:
             cpu: "0.6"
         livenessProbe:
           exec:
-            command:
-              - /bin/sh
-              - -c
-              - >
-                curl -H "Authorization: Basic ${RABBITMQ_BASIC_AUTH}" http://localhost:15672/api/aliveness-test/%2F
-          initialDelaySeconds: 15
-          periodSeconds: 5
+            # This is just an example. There is no "one true health check" but rather
+            # several rabbitmq-diagnostics commands that can be combined to form increasingly comprehensive
+            # and intrusive health checks.
+            # Learn more at https://www.rabbitmq.com/monitoring.html#health-checks.
+            #
+            # Stage 2 check:
+            command: ["rabbitmq-diagnostics", "status", "--erlang-cookie", "$(RABBITMQ_ERLANG_COOKIE)"]
+          initialDelaySeconds: 60
+          # See https://www.rabbitmq.com/monitoring.html for monitoring frequency recommendations.
+          periodSeconds: 60
+          timeoutSeconds: 15
         readinessProbe:
           exec:
-            command:
-              - /bin/sh
-              - -c
-              - >
-                curl -H "Authorization: Basic ${RABBITMQ_BASIC_AUTH}" http://localhost:15672/api/aliveness-test/%2F
-          initialDelaySeconds: 15
-          periodSeconds: 5
+            # This is just an example. There is no "one true health check" but rather
+            # several rabbitmq-diagnostics commands that can be combined to form increasingly comprehensive
+            # and intrusive health checks.
+            # Learn more at https://www.rabbitmq.com/monitoring.html#health-checks.
+            #
+            # Stage 2 check:
+            command: ["rabbitmq-diagnostics", "status", "--erlang-cookie", "$(RABBITMQ_ERLANG_COOKIE)"]
+            # To use a stage 4 check:
+            # command: ["rabbitmq-diagnostics", "check_port_connectivity", "--erlang-cookie", "$(RABBITMQ_ERLANG_COOKIE)"]
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          timeoutSeconds: 10
         envFrom:
          - configMapRef:
              name: rabbitmq-cfg
@@ -228,18 +237,16 @@ spec:
                 fieldPath: metadata.namespace
           - name: RABBITMQ_USE_LONGNAME
             value: "true"
-          - name: RABBITMQ_BASIC_AUTH
-			value: 1234
           - name: RABBITMQ_NODENAME
             value: "rabbit@$(HOSTNAME).rabbitmq-internal.$(NAMESPACE).svc.cluster.local"
           - name: K8S_SERVICE_NAME
             value: "rabbitmq-internal"
           - name: RABBITMQ_DEFAULT_USER
-			value: usr
+            value: usr
           - name: RABBITMQ_DEFAULT_PASS
-			value: secret_pass
+            value: secret_pass
           - name: RABBITMQ_ERLANG_COOKIE
-			value: secret_cookie
+            value: secret_cookie
           - name: NODE_NAME
             valueFrom:
               fieldRef:
@@ -252,7 +259,7 @@ The first interesting part is the `postStart` lifecycle hook. This hook executes
 
 This means more synchronization work, which has a performance tax, but there are also other settings for queue mirroring and you should take the one suiting your needs the best.
 
-Next up, we define ports and resource limits, which is not that interesting, but then we define the `livenessProbe` and the `readinessProbe`. There several ways to check, if a rabbitmq instance is healthy, or ready. In this case, we use a very lightweight approach of simply sending something on the `aliveness-test` queue, using a BasicAuth token (which we'll define further down) to do so.
+Next up, we define ports and resource limits, which is not that interesting, but then we define the `livenessProbe` and the `readinessProbe`. There several ways to check, if a rabbitmq instance is healthy, or ready, there is even a [detailed article](https://www.rabbitmq.com/monitoring.html#health-checks) about the topic. In this case, we use the [recommended](https://github.com/rabbitmq/rabbitmq-peer-discovery-k8s/blob/master/examples/minikube/statefulset.yaml#L54) approach using `rabbitmq-diagnostics`.
 
 The advantage of this approach is that the impact on the rabbitmq instance is very little, whereas a full status query would take some time to fulfill. The disadvantage is of course, that it's only a very basic test and there could be hidden issues, while sending to our test-queue would still work fine. Everything's a trade-off - this is a simple solution, but there are other, more sophisticated ways to do this I'm sure, which might fit your needs better.
 
@@ -263,7 +270,6 @@ Let's go through them one by one:
 * `HOSTNAME` - we take this from the metadata, it will simply be `rabbitmq-0...n`
 * `NAMESPACE` - we also take this from the metadata, we will need it further down for creating the node name
 * `RABBITMQ_USE_LONGNAME` - use fully qualified names to identify rmq nodes
-* `RABBITMQ_BASIC_AUTH` - the basic auth string used for the livenessProbe
 * `RABBITMQ_NODENAME` - this is the node name of the pod based on the peer-discovery config - e.g. `rabbit@rabbitmq-0.rabbitmq-internal.example.svc.cluster.local`
 * `K8S_SERVICE_NAME` - the k8s service name
 * `RABBITMQ_DEFAULT_USER` - login user
@@ -279,9 +285,13 @@ Setting up the RabbitMQ cluster inside kubernetes took me quite a while when I f
 
 I realize, that this post covered a lot of stuff and that it doesn't go into any details and frankly, I wouldn't say I'm an expert on RabbitMQ or Kubernetes, but for simply setting this up, that's also not necessary. However, if you want to run something like this in production, it would definitely make sense to dive a bit deeper.
 
+*A Big Thank you to [michaelklishin](https://github.com/michaelklishin) of the RabbitMQ Core Team for pointing out a better way to do the health check, which I edited in the post above.*
+
 #### Resources
 
 * [RabbitMQ](https://www.rabbitmq.com/) 
+* [RabbitMQ K8s Statefulset Baseline Config](https://github.com/rabbitmq/rabbitmq-peer-discovery-k8s/blob/master/examples/minikube/statefulset.yaml)
+* [RabbitMQ Article about Health Checks](https://www.rabbitmq.com/monitoring.html#health-checks)
 * [RabbitMQ Kubernetes Cluster Config](https://www.rabbitmq.com/cluster-formation.html#peer-discovery-k8s) 
 * [Kubernetes](https://kubernetes.io/)
 * [Minikube](https://github.com/kubernetes/minikube)
