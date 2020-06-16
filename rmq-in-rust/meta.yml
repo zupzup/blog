@@ -1,0 +1,7 @@
+title: Using RabbitMQ in Rust 
+short: "In this post we will look at how to use RabbitMQ inside of a Rust Web Service"
+date: 22.06.2020
+tags:
+    - rust
+    - rabbitmq
+    - queue
