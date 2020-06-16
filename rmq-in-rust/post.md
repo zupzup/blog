@@ -122,7 +122,7 @@ First, we get a RabbitMQ connection from the pool, create a channel and make sur
 
 This consumer is actually a `Stream`, so at the end of the function, we simply iterate over the stream. If any of the operations fail, or if there is nothing left to get from the stream, the outer `rmq_listen` function will restart the process. If we receive a message, we simply log it and acknowledge it.
 
-Ok, so now we have a way to receive messages from the queue. The only thing left is a way to send events to RabbitMQ using our `/msg` handler. In order to do that, we first need a way to pass the RabbitMQ pool to the handler:
+OK, so now we have a way to receive messages from the queue. The only thing left is a way to send events to RabbitMQ using our `/msg` handler. In order to do that, we first need a way to pass the RabbitMQ pool to the handler:
 
 ```rust
 fn with_rmq(pool: Pool) -> impl Filter<Extract = (Pool,), Error = Infallible> + Clone {
