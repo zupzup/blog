@@ -287,7 +287,7 @@ Setting up the RabbitMQ cluster inside kubernetes took me quite a while when I f
 
 I realize, that this post covered a lot of stuff and that it doesn't go into any details and frankly, I wouldn't say I'm an expert on RabbitMQ or Kubernetes, but for simply setting this up, that's also not necessary. However, if you want to run something like this in production, it would definitely make sense to dive a bit deeper.
 
-*A Big Thank you to [michaelklishin](https://github.com/michaelklishin) of the RabbitMQ Core Team for pointing out a better way to do the health check, which I edited in the post above.*
+*A Big Thank you to [michaelklishin](https://github.com/michaelklishin) of the RabbitMQ Core Team for pointing out a better way to do the health check, startup hook and high availability config, which I edited in the post above.*
 
 #### Resources
 
