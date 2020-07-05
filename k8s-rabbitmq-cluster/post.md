@@ -181,8 +181,8 @@ spec:
                 - /bin/sh
                 - -c
                 - >
-                  until rabbitmqctl --erlang-cookie ${RABBITMQ_ERLANG_COOKIE} node_health_check; do sleep 1; done;
-                  rabbitmqctl --erlang-cookie ${RABBITMQ_ERLANG_COOKIE} set_policy ha-all "" '{"ha-mode":"all", "ha-sync-mode": "automatic"}'
+                  until rabbitmqctl --erlang-cookie ${RABBITMQ_ERLANG_COOKIE} await_startup; do sleep 1; done;
+                  rabbitmqctl --erlang-cookie ${RABBITMQ_ERLANG_COOKIE} set_policy ha-two "" '{"ha-mode":"exactly", "ha-params": 2, "ha-sync-mode": "automatic"}'
 
         ports:
         - containerPort: 4369
@@ -255,7 +255,9 @@ spec:
 
 We start out rather basic - defining a `rabbitmq` StatefulSet, configuring update-strategy, service and replicas. Nothing out of the ordinary there, but then we get to the pod template.
 
-The first interesting part is the `postStart` lifecycle hook. This hook executes a script, which first waits until the node is healthy and then sets the `ha-mode`. This is the high-availability mode configuration of rabbitmq. We set it to `all`, which means, that the whole queue will be mirrored to other nodes in the cluster, so we can't lose data, even if one node dies.
+The first interesting part is the `postStart` lifecycle hook. This hook executes a script, which first waits until the node is healthy and then sets the `ha-mode`. This is the high-availability mode configuration of rabbitmq. We set it to our custom policy `ha-two`, which means, that the whole queue will be mirrored to two of the three nodes in the cluster, so it's very unlikely we lose data, even if nodes die.
+
+It's important to mention here, that there are in fact many different ways to configure `high-availability` in rabbitMQ. Which setting to use will depend on your use-case. For more information, check out these resources on [mirrored queues](https://www.rabbitmq.com/ha.html) and the new [quorum queues](https://www.rabbitmq.com/quorum-queues.html).
 
 This means more synchronization work, which has a performance tax, but there are also other settings for queue mirroring and you should take the one suiting your needs the best.
 
@@ -295,3 +297,5 @@ I realize, that this post covered a lot of stuff and that it doesn't go into any
 * [RabbitMQ Kubernetes Cluster Config](https://www.rabbitmq.com/cluster-formation.html#peer-discovery-k8s) 
 * [Kubernetes](https://kubernetes.io/)
 * [Minikube](https://github.com/kubernetes/minikube)
+* [Mirrored Queues](https://www.rabbitmq.com/ha.html)
+* [Quorum Queues](https://www.rabbitmq.com/quorum-queues.html)
