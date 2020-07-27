@@ -1,0 +1,9 @@
+title: Basic Role-Based HTTP Authorization in Rust with Casbin
+short: "In this post we'll look at how to do web authorization using the casbin-rs library within a Rust warp-rs web service."
+date: 27.07.2020
+tags:
+    - rust
+    - casbin
+    - authorization
+    - security
+    - warp
