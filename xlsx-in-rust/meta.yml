@@ -1,0 +1,6 @@
+title: Creating Excel files in Rust 
+short: "Sometimes you need to generate Excel files. You never WANT to, but sometimes you have to. In this post we'll look at how you can do it with Rust. :)"
+date: 24.09.2020
+tags:
+    - rust
+    - excel

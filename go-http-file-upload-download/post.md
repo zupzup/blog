@@ -13,7 +13,7 @@ Let's see how Go can solve this omnipresent problem of web engineering.
 First, we set up the web server with our two routes `/upload` for the File Upload and `/files/*` for the File Download.
 
 ```go
-const maxUploadSize = 2 * 1024 // 2 MB 
+const maxUploadSize = 2 * 1024 * 1024 // 2 MB 
 const uploadPath = "./tmp"
 
 func main() {
@@ -102,10 +102,13 @@ Now that we successfully validated and read the file, it's time to check the fil
 Gladly, the Go standard library provides us with the `http.DetectContentType` function, which only needs the first 512 bytes of the file to detect its file type based on the `mimesniff` algorithm.
 
 ```go
-filetype := http.DetectContentType(fileBytes)
-if filetype != "image/jpeg" && filetype != "image/jpg" &&
-    filetype != "image/gif" && filetype != "image/png" &&
-    filetype != "application/pdf" {
+detectedFileType := http.DetectContentType(fileBytes)
+switch detectedFileType {
+case "image/jpeg", "image/jpg":
+case "image/gif", "image/png":
+case "application/pdf":
+    break
+default:
     renderError(w, "INVALID_FILE_TYPE", http.StatusBadRequest)
     return
 }
@@ -115,13 +118,13 @@ In a real-world application, we would probably do something with the file metada
 
 ```go
 fileName := randToken(12)
-fileEndings, err := mime.ExtensionsByType(fileType)
+fileEndings, err := mime.ExtensionsByType(detectedFileType)
 if err != nil {
     renderError(w, "CANT_READ_FILE_TYPE", http.StatusInternalServerError)
     return
 }
 newPath := filepath.Join(uploadPath, fileName+fileEndings[0])
-fmt.Printf("FileType: %s, File: %s\n", fileType, newPath)
+fmt.Printf("FileType: %s, File: %s\n", detectedFileType, newPath)
 ```
 
 Almost done - just one very important step left - writing the file. As mentioned above, we simply copy the byte array we got from reading the file to a newly created file handler called `newFile`.
