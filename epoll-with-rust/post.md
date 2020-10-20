@@ -40,7 +40,7 @@ use std::io;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 
-const HTTP_RESP: &[u8] = br#"HTTP/1.1 200 OK
+const HTTP_RESP: &[u8] = b#"HTTP/1.1 200 OK
 content-type: text/html
 content-length: 5
 
@@ -397,14 +397,17 @@ One thing to note, because we completely skimped on error handling in this post,
 So let's send some longer-running requests to the server:
 
 ```bash
-while true; do curl --location --request POST 'http://localhost:8000/upload' \--form 'file=@/home/somewhere/some_image.png' -w ' Total: %{time_total}' && echo '\n'; done;
+while true; do curl --location --request \
+POST 'http://localhost:8000/upload' \
+--form 'file=@/home/somewhere/some_image.png' \
+-w ' Total: %{time_total}' && echo '\n'; done;
 ```
 
 This command, sends a file (optimally a bigger one - several megabytes for example), to our server in an endless loop. We can start this script in multiple terminals and we'll have a big of IO-heavy traffic going on.
 
 Also, with `-w %{time_total}`, we time the request and print out something like:
 
-```
+```bash
 Hello Total: 1,010951
 ```
 
@@ -436,13 +439,14 @@ I do hope I was able to get some of my new understanding across to you, dear rea
 
 My plan is to move further up the stack, exploring the depths of asynchronous programming in Rust some more.
 
-I'm not sure what the next post(s) will be about, but the goal would be to fully grasp what happens when I write and call an `async` function in Rust, which deals with IO. I'm excited to continue on this path and to see where it'll lead me. :)
+I'm not sure what the next post(s) will be about, but the goal would be to fully grasp what happens when I write and call an `async` function in Rust, which deals with IO. I'm excited to continue on this path and to see where it'll lead me.
 
 #### Resources
 
 * [Code Example](https://github.com/zupzup/rust-epoll-example)
 * [Asynchronous Programming Under Linux](https://unixism.net/loti/async_intro.html)
 * [Linux Applications Performance: Part VII: epoll Servers](https://unixism.net/2019/04/linux-applications-performance-part-vii-epoll-servers/)
+* [Exploring Async Basics](https://cfsamson.github.io/book-exploring-async-basics/introduction.html)
 * [Epoll, Kqueue and IOCP](https://cfsamson.github.io/book-exploring-async-basics/6_epoll_kqueue_iocp.html)
 * [Polling Rust Library](https://github.com/stjepang/polling)
 * [Mio](https://github.com/tokio-rs/mio)
