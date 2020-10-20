@@ -40,11 +40,11 @@ use std::io;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 
-const HTTP_RESP: &[u8] = b#"HTTP/1.1 200 OK
+const HTTP_RESP: &[u8] = b"HTTP/1.1 200 OK
 content-type: text/html
 content-length: 5
 
-Hello"#;
+Hello";
 
 fn main() -> io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:8000")?;
