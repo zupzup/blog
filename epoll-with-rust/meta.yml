@@ -1,0 +1,9 @@
+title: Basic non-blocking IO using epoll in Rust
+short: "This is the first blog post in a small series, where we will explore the basics of non-blocking IO in Rust. We'll start by building a minimal HTTP server using epoll"
+date: 20.10.2020
+tags:
+    - rust
+    - epoll
+    - linux
+    - async
+    - nonblocking
