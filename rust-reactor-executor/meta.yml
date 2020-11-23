@@ -1,0 +1,8 @@
+title: Basic Reactor and Executor for non-blocking IO in Rust
+short: "In this second part of our journey to try and understand how async I/O works in Rust, we'll build a simple reactor/executor model."
+date: 23.11.2020
+tags:
+    - rust
+    - nonblocking
+    - async
+    - futures
