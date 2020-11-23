@@ -354,11 +354,11 @@ pub struct RequestContext {
     pub buf: Vec<u8>,
 }
 
-const HTTP_RESP: &[u8] = br#"HTTP/1.1 200 OK
+const HTTP_RESP: &[u8] = b"HTTP/1.1 200 OK
 content-type: text/html
 content-length: 5
 
-Hello"#;
+Hello";
 ```
 
 We're wrapping these globals inside of Mutexes as well, since we might be using them from different threads concurrently.
