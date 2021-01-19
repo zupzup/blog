@@ -439,8 +439,6 @@ I do hope I was able to get some of my new understanding across to you, dear rea
 
 My plan is to move further up the stack, exploring the depths of asynchronous programming in Rust some more.
 
-I'm not sure what the next post(s) will be about, but the goal would be to fully grasp what happens when I write and call an `async` function in Rust, which deals with IO. I'm excited to continue on this path and to see where it'll lead me.
-
 #### Resources
 
 * [Code Example](https://github.com/zupzup/rust-epoll-example)

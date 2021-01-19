@@ -8,9 +8,7 @@ If you're asking yourself at this point why this is interesting, or useful, I wo
 
 Of course all of this has been implemented already and we could just use async/await and one of the many great async run times in Rust, but that doesn't mean we have any idea what goes on under the hood.
 
-The end goal of this series is to build and hence understand a very basic async runtime, which supports Rust's async/await and can run Rust Futures.
-
-But we're not there yet and the goal in this post is to create a reactor/executor system, which will enable us to register callbacks, which are executed every time a async I/O event happens.
+The goal in this post is to create a reactor/executor system, which will enable us to register callbacks, which are executed every time a async I/O event happens.
 
 The example, as in the above mentioned post about epoll, will be a very simplistic HTTP server.
 
@@ -594,7 +592,7 @@ That's it - the full code can be found [here](https://github.com/zupzup/rust-rea
 
 ## Conclusion
 
-Another step complete towards our goal of understanding how asynchronous I/O works in Rust. The next step will be to build a simple async runtime, which can run Rust Futures.
+Another step complete towards our goal of understanding how asynchronous I/O works in Rust.
 
 This simplistic reactor/executor stage is a bit wonky and my architecture is highly inefficient and un-ergonomic, but it does work and we're able to fully asynchronously handle incoming HTTP requests. So yay! :)
 
