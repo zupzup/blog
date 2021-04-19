@@ -275,3 +275,4 @@ As mentioned in the introduction, Go is not a traditional language for Machine L
 * [Logistic Regression](https://en.wikipedia.org/wiki/Logistic_regression)
 * [Gradient Descent](https://en.wikipedia.org/wiki/Gradient_descent)
 * [Courseduck Ranking of ML Courses](https://courseduck.com/programming/machine-learning/)
+* [Python Introduction](https://jobtensor.com/Python-Introduction)
