@@ -32,7 +32,11 @@ It's easy to forget the immense privilege one enjoys in a country such as Austri
 
 There are some conditions when it comes to the educational sabbatical in the form of having to provide proof that you actually did something educational worth a certain amount of "credits", or "time". This mandatory limit is low enough, however, that any type of university curriculum will be way above it, including a PhD program.
 
-The next step is to pinpoint a topic I want to start researching and dive deeper on. This turns out to be a bit difficult while working full time - at least for me. I'm planning to take some time off at the beginning of the sabbatical to really get away from everything and to re-focus. In the past, clearing my mind in this way has helped me find the right path.
+The next step is to pinpoint a topic I want to start researching and dive deeper on. This turns out to be a bit difficult while working full time - at least for me.
+
+My problem isn't finding a topic, as much as only finding one area, or topic, as there are quite a few things I find interesting and could see myself exploring more deeply.
+
+I'm planning to take some time off at the beginning of the sabbatical to really get away from everything and to re-focus. In the past, clearing my mind in this way has helped me find the right path.
 
 So after this long, frustrating journey of figuring out what's next, I finally arrived at a point where I'm really looking forward to this new path.
 
