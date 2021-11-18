@@ -98,7 +98,7 @@ All Done!
 
 ## Conclusion
 
-What a nice entry-level CTF and one of the first unguided ones I was able to, after going through almost all entry-level THM rooms mentioned [here](https://blog.tryhackme.com/free_path/) before, finish without looking at any writeups, or any external help myself!
+What a nice entry-level CTF and one of the first unguided ones I was able to, after going through almost all entry-level THM rooms mentioned [here](https://tryhackme.com/resources/blog/free_path) before, finish without looking at any writeups, or any external help myself!
 
 #### Resources
 
