@@ -18,7 +18,7 @@ Also, all of these great feats of progress in our communication and collaboratio
 
 If you're interested in diving deeper into this whole topic, I can very much recommend the following two books on privacy and algorithmic exploitation:
 
-* [Weapons of Math Destruction by Cathy O'Neil](https://weaponsofmathdestructionbook.com/)
+* [Weapons of Math Destruction by Cathy O'Neil](https://en.wikipedia.org/wiki/Weapons_of_Math_Destruction)
 * [Privacy is Power by Carissa Véliz](https://www.carissaveliz.com/books)
 
 Now, how to find these services, which provide the wonders of modern technology without sacrificing our privacy?
@@ -89,5 +89,5 @@ However, being able to trust the technology I use daily without having to blissf
 * [Notable](https://github.com/notable/notable)
 * [Protonmail](https://protonmail.com)
 * [Tresorit](https://tresorit.com/)
-* [Weapons of Math Destruction by Cathy O'Neil](https://weaponsofmathdestructionbook.com/)
+* [Weapons of Math Destruction by Cathy O'Neil](https://en.wikipedia.org/wiki/Weapons_of_Math_Destruction)
 * [Privacy is Power by Carissa Véliz](https://www.carissaveliz.com/books)
