@@ -1,0 +1,8 @@
+title: A Writing Trainer written in TypeScript and React
+short: "In this tutorial, we will create a basic Express backend and React frontend for a writing trainer using TypeScript."
+date: 24.02.2022
+tags:
+    - typescript
+    - javascript
+    - react
+    - writing
