@@ -46,11 +46,11 @@ At some point, I decided to move away from Gmail and Google services in general,
 
 First, I moved to [Fastmail](https://fastmail.com/), which was already a huge improvement over Gmail in terms of privacy. However, one thing that still bothered me was the fact that Fastmail used servers hosted in the US. Now, the fact that Fastmail is not a US company means that technically, no US government agency can access the data within Fastmail's servers without first applying to Australian authorities, which is good. [more about this here](https://fastmail.blog/company/fastmails-servers-are-in-the-us-what-this-means-for-you/).
 
-I was quite happy with Fastmail and used the service for 3 years. The only reason I switched was because I found [Protonmail](https://protonmail.com), a security and privacy focused email provider from Switzerland, which fit my needs even better.
+I was quite happy with Fastmail and used the service for 3 years. The only reason I switched was because I found [Protonmail](https://proton.me), a security and privacy focused email provider from Switzerland, which fit my needs even better.
 
 First of all, Protonmail's servers are located in Switzerland and it's a Swiss company, so all data is protected by Swiss privacy laws, which are as strict, or stricter than the laws regarding data privacy within the EU, which is a whole different quality from the US.
 
-Besides that, Protonmail adds another layer of encryption and security and while it's not possible to fully end-to-end encrypt emails due to protocol limitations, all internal email traffic within Protonmail is fully encrypted and Protonmail itself can't read customer's emails. The same goes for Protonmail Calendar, which has a unique (to my knowledge) approach to encryption, which is explained [here](https://protonmail.com/blog/protoncalendar-beta-announcement/).
+Besides that, Protonmail adds another layer of encryption and security and while it's not possible to fully end-to-end encrypt emails due to protocol limitations, all internal email traffic within Protonmail is fully encrypted and Protonmail itself can't read customer's emails. The same goes for Protonmail Calendar, which has a unique (to my knowledge) approach to encryption, which is explained [here](https://proton.me/calendar).
 
 The Protonmail apps work well enough for me, although the Calendar is, at this time, still in Beta. Another side-effect to the rigorous encryption is that everything is a bit slower, since, for example, the calendar needs to be decrypted every time it's accessed. For me personally, this trade-off is not an issue though.
 
@@ -87,7 +87,7 @@ However, being able to trust the technology I use daily without having to blissf
 
 * [e-Foundation](https://e.foundation/)
 * [Notable](https://github.com/notable/notable)
-* [Protonmail](https://protonmail.com)
+* [Protonmail](https://proton.me)
 * [Tresorit](https://tresorit.com/)
 * [Weapons of Math Destruction by Cathy O'Neil](https://en.wikipedia.org/wiki/Weapons_of_Math_Destruction)
 * [Privacy is Power by Carissa Véliz](https://www.carissaveliz.com/books)
