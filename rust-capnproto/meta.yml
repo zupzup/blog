@@ -1,0 +1,8 @@
+title: Using Cap'n Proto with Rust
+short: "Cap'n Proto is a binary serialization and RPC system optimized for performance. In this article, we'll take a look at how we can use it within Rust." 
+date: 04.08.2023
+tags:
+    - rust
+    - capnproto
+    - serialization
+    - rpc
