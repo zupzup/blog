@@ -23,17 +23,12 @@ For our purposes, it's enough to have it installed, since it'll be used during t
 
 Then, we create a new project using `cargo init` and edit `Cargo.toml` to include the following dependencies:
 
-```toml
-[dependencies]
-capnp = "=0.17.2"
-tokio = { version = "=1.29.1", features = ["full"] }
-serde = {version = "=1.0", features = ["derive"] }
-serde_json = "=1.0"
-base64 = "=0.21.2"
-
-[build-dependencies]
-capnpc = "=0.17.2"
-```
+* `capnp`
+* `capnpc`
+* `tokio`
+* `serde`
+* `serde_json`
+* `base64`
 
 We're using Cap'n Proto, so we need both the runtime and build library for it. Also, since we're building a networked app, we'll use Tokio to build a simple server and client implementation and we'll need Serde to implement our JSON baseline for comparison. And finally, we'll use the `base64` crate to encode the binary image data, so we can send it as a String within the JSON payload.
 
