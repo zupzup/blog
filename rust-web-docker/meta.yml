@@ -1,0 +1,8 @@
+title: Packaging a Rust web service using Docker
+short: "In this post, I’ll show how to put a Rust web application inside a Docker container, presenting two approaches with different tradeoffs."
+date: 01.08.2020
+tags:
+    - rust
+    - web
+    - docker
+canonical: https://blog.logrocket.com/packaging-a-rust-web-service-using-docker/
