@@ -1,0 +1,8 @@
+title: Using Redis in a Rust web service
+short: "In this post, I’ll show how to use Redis in a Rust web application."
+date: 01.09.2020
+tags:
+    - rust
+    - web
+    - redis
+canonical: https://blog.logrocket.com/using-redis-in-a-rust-web-service/
