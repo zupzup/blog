@@ -8,9 +8,9 @@ We’ll build the application using the fantastic [warp](https://github.com/sean
 
 We’ll explore three approaches to using Redis:
 
-    Directly, using one asynchronous connection per request
-    Using a synchronous connection pool
-    Using an asynchronous connection pool
+* Directly, using one asynchronous connection per request
+* Using a synchronous connection pool
+* Using an asynchronous connection pool
 
 As a client library for Redis, [redis-rs](https://github.com/mitsuhiko/redis-rs) is the most stable and widely used crate, so all variants use it as their basis.
 
