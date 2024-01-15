@@ -1,0 +1,9 @@
+title: End-to-end testing for Rust web services
+short: "In this post, I’ll show how to implement end-to-end testing in a Rust web application."
+date: 01.09.2020
+tags:
+    - rust
+    - web
+    - testing
+    - end2end
+canonical: https://blog.logrocket.com/end-to-end-testing-for-rust-web-services/
