@@ -1,0 +1,8 @@
+title: Using MongoDB in a Rust web service
+short: "In this post, we'll look at how to implement a Rust web service using MongoDB"
+date: 01.10.2020
+tags:
+    - rust
+    - web
+    - mongodb
+canonical: https://blog.logrocket.com/using-mongodb-in-a-rust-web-service/
