@@ -1,0 +1,8 @@
+title: Using Prometheus metrics in a Rust web service
+short: "In this post, I’ll show how to add Prometheus metrics to a Rust web application."
+date: 05.10.2020
+tags:
+    - rust
+    - web
+    - prometheus
+canonical: https://blog.logrocket.com/using-prometheus-metrics-in-a-rust-web-service/
