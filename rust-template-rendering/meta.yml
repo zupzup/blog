@@ -1,0 +1,9 @@
+title: Template rendering in Rust
+short: "In this post, we'll look at template rendering in a Rust web app."
+date: 12.10.2020
+tags:
+    - rust
+    - web
+    - template
+    - rendering
+canonical: https://blog.logrocket.com/template-rendering-in-rust/
