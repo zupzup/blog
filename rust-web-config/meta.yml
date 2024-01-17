@@ -1,0 +1,8 @@
+title: Configuration management in Rust web services
+short: "In this post, I’ll show how to implement configuration management in a Rust web application."
+date: 12.11.2020
+tags:
+    - rust
+    - web
+    - config
+canonical: https://blog.logrocket.com/configuration-management-in-rust-web-services/
