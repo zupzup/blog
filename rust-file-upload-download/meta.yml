@@ -1,0 +1,9 @@
+title: File upload and download in Rust
+short: "In this post, we'll look at how to implement file upload and download in a Rust web application."
+date: 01.11.2020
+tags:
+    - rust
+    - web
+    - upload
+    - download
+canonical: https://blog.logrocket.com/file-upload-and-download-in-rust/
