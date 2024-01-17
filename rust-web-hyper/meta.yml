@@ -1,0 +1,8 @@
+title: Write a simple web service in Rust using hyper
+short: "In this post, I’ll show how to implement a Rust web application using the hyper library."
+date: 03.12.2020
+tags:
+    - rust
+    - web
+    - hyper
+canonical: https://blog.logrocket.com/a-minimal-web-service-in-rust-using-hyper/
