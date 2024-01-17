@@ -1,0 +1,9 @@
+title: Timezone handling in Rust with Chrono-TZ
+short: "In this post, I’ll show how to handle timezones in a Rust web application."
+date: 05.12.2020
+tags:
+    - rust
+    - tz
+    - timezone
+    - chrono
+canonical: https://blog.logrocket.com/timezone-handling-in-rust-with-chrono-tz/
