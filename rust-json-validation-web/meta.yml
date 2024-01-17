@@ -1,0 +1,9 @@
+title: Easy guide to JSON input validation in Rust web services
+short: "In this post, I’ll show how to implement JSON input validation in a Rust web application."
+date: 28.11.2020
+tags:
+    - rust
+    - web
+    - json
+    - validation
+canonical: https://blog.logrocket.com/json-input-validation-in-rust-web-services/
