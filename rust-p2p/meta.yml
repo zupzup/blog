@@ -1,4 +1,4 @@
-title: Build a peer-to-peer app in Rust with libp2p
+title: "libp2p tutorial: Build a peer-to-peer app in Rust"
 short: "In this post, I’ll show how to implement a peer-to-peer application in Rust using libp2p"
 date: 31.12.2020
 tags:
