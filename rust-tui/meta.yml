@@ -1,0 +1,8 @@
+title: "Rust and TUI: Building a command-line interface in Rust"
+short: "In this post, I’ll show how to implement a command line application using TUI."
+date: 15.02.2021
+tags:
+    - rust
+    - tui
+    - cli
+canonical: https://blog.logrocket.com/rust-and-tui-building-a-command-line-interface-in-rust/
