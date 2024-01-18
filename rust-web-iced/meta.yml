@@ -1,0 +1,8 @@
+title: Iced.rs tutorial: How to build a simple Rust frontend web app
+short: "In this post, I’ll show how to implement a frontend Rust web application using iced.rs."
+date: 27.10.2021
+tags:
+    - rust
+    - web
+    - iced
+canonical: https://blog.logrocket.com/iced-rs-tutorial-rust-frontend-web-app/
