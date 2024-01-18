@@ -1,0 +1,9 @@
+title: Build a Rust + WebAssembly frontend web app with Yew
+short: "In this post, I’ll show how to implement a Rust frontend, WASM-based web application."
+date: 29.06.2021
+tags:
+    - rust
+    - web
+    - wasm
+    - yew
+canonical: https://blog.logrocket.com/rust-webassembly-frontend-web-app-yew/
