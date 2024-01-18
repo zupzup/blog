@@ -35,14 +35,11 @@ First, create a new Rust project:
 
 Then, delete the `src` folder and edit the `Cargo.toml` file as follows:
 
-```otml
+```toml
     [workspace]
-    
     members = [
         "backend",
         "frontend",
-    
-        #Internal
         "common"
     ]
 ```
