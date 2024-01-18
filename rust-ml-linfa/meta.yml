@@ -1,0 +1,8 @@
+title: Machine learning in Rust using Linfa
+short: "In this post, I’ll show how to create a basic machine-learning application in Rust."
+date: 15.05.2021
+tags:
+    - rust
+    - ml
+    - linfa
+canonical: https://blog.logrocket.com/machine-learning-in-rust-using-linfa/
