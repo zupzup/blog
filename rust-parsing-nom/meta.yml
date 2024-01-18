@@ -1,0 +1,8 @@
+title: Parsing in Rust with nom
+short: "In this post, I’ll show how use the nom library for parsing in Rust."
+date: 30.12.2020
+tags:
+    - rust
+    - parsing
+    - nom
+canonical: https://blog.logrocket.com/parsing-in-rust-with-nom/
