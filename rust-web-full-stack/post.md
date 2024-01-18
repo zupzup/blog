@@ -184,7 +184,7 @@ Let’s continue with the backend part of our app.
 
 We start off with the database definition for our data model:
 
-```sql
+```bash
     CREATE TABLE IF NOT EXISTS owner
     (
         id SERIAL PRIMARY KEY NOT NULL,
@@ -535,7 +535,6 @@ You can test it using cURL by running commands such as this:
 
 ```bash
     curl -X POST http://localhost:8000/owner -d '{"name": "mario"}' -H 'content-type: application/json'
-    
     curl -v -X POST http://localhost:8000/owner/1/pet -d '{"name": "minka", "animal_type": "cat", "color": "black-brown-white"}' -H 'content-type: application/json'
 ```
 
