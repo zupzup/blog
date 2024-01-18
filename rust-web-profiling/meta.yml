@@ -1,0 +1,8 @@
+title: An introduction to profiling a Rust web application
+short: "In this post, I’ll show how to profile a Rust web application."
+date: 12.05.2021
+tags:
+    - rust
+    - web
+    - profiling
+canonical: https://blog.logrocket.com/an-introduction-to-profiling-a-rust-web-application/
