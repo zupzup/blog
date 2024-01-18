@@ -1,0 +1,8 @@
+title: Debugging Rust apps with GDB
+short: "In this post, I’ll show how to use GDB to debug Rust applications."
+date: 26.02.2021
+tags:
+    - rust
+    - gdb
+    - debugging
+canonical: https://blog.logrocket.com/debugging-rust-apps-with-gdb/
