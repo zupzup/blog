@@ -1,0 +1,7 @@
+title: How to build a blockchain in Rust
+short: "In this post, I’ll show how to implement a simple Blockchain from scratch in Rust."
+date: 14.12.2021
+tags:
+    - rust
+    - blockchain
+canonical: https://blog.logrocket.com/how-to-build-a-blockchain-in-rust/

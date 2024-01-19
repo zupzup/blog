@@ -1,0 +1,10 @@
+title: Substrate blockchain application with a custom React frontend
+short: "In this post, I’ll show how to implement a custom React frontend for a Rust-based Substrate blockchain application."
+date: 15.06.2022
+tags:
+    - rust
+    - blockchain
+    - substrate
+    - frontend
+    - react
+canonical: https://blog.logrocket.com/substrate-blockchain-application-custom-react-frontend/

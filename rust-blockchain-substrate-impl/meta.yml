@@ -1,0 +1,8 @@
+title: How to build a custom blockchain implementation in Rust using Substrate
+short: "In this post, I’ll show how to implement a custom blockchain in Rust using Substrate."
+date: 01.03.2022
+tags:
+    - rust
+    - blockchain
+    - substrate
+canonical: https://blog.logrocket.com/custom-blockchain-implementation-rust-substrate/
