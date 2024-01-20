@@ -1,0 +1,9 @@
+title: Create an async CRUD web service in Rust with warp
+short: "In this post, I’ll show how to implement an async CRUD Rust web application using Warp."
+date: 09.05.2023
+tags:
+    - rust
+    - async
+    - crud
+    - warp
+canonical: https://blog.logrocket.com/async-crud-web-service-rust-warp/

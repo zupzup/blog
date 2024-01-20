@@ -1,0 +1,8 @@
+title: How to build a WebSocket server with Rust
+short: "In this post, I’ll show how implement a WebSocket server with Rust."
+date: 12.05.2023
+tags:
+    - rust
+    - web
+    - websocket
+canonical: https://blog.logrocket.com/build-websocket-server-with-rust/
