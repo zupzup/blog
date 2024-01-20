@@ -1,0 +1,8 @@
+title: Writing webpack plugins in Rust using SWC for faster builds
+short: "In this post, I’ll show how to use SWC for writing Webpack plugins in Rust."
+date: 21.06.2023
+tags:
+    - rust
+    - webpack
+    - swc
+canonical: https://blog.logrocket.com/writing-webpack-plugins-rust-using-swc/
