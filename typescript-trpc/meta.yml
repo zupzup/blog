@@ -1,6 +1,6 @@
 title: Build a full-stack TypeScript app using tRPC and React
 short: "In this post, I’ll show how to use tRPC to build a full-stack TypeScript app."
-date: 31.06.2023
+date: 30.06.2023
 tags:
     - typescript
     - trpc
