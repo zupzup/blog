@@ -1,0 +1,8 @@
+title: "Fleet: A build tool for improving Rust’s Cargo"
+short: "In this post, I’ll show how to improve Rust build times using Fleet."
+date: 20.08.2022
+tags:
+    - rust
+    - build
+    - fleet
+canonical: https://blog.logrocket.com/introducing-fleet-improving-rusts-cargo/

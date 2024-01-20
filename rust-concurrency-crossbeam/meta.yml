@@ -1,0 +1,8 @@
+title: Concurrent programming in Rust with Crossbeam
+short: "In this post, I’ll show how to use Crossbeam for concurrent programming in Rust."
+date: 22.12.2022
+tags:
+    - rust
+    - concurrency
+    - crossbeam
+canonical: https://blog.logrocket.com/concurrent-programming-rust-crossbeam/

@@ -1,0 +1,8 @@
+title: Understanding String and &str in Rust
+short: "In this post, I’ll go into the differences between String and &str in Rust."
+date: 12.08.2022
+tags:
+    - rust
+    - string
+    - str
+canonical: https://blog.logrocket.com/understanding-rust-string-str/
