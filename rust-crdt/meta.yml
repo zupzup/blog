@@ -1,0 +1,7 @@
+title: Using CRDTs to build collaborative Rust web applications
+short: "In this post, I’ll show how to build a simple web app leveraging CRDTs for keeping consistent state between all clients."
+date: 23.02.2024
+tags:
+    - rust
+    - crdt
+canonical: https://blog.logrocket.com/using-crdts-build-collaborative-rust-web-applications/
