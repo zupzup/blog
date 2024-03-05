@@ -1,0 +1,10 @@
+title: Building a simple AI chatbot using Rust and Ollama
+short: "In this post, we'll build a simple AI chatbot, leveraging a locally running LLM, using Rust and Ollama."
+date: 09.03.2024
+tags:
+    - rust
+    - async
+    - ai
+    - llm
+    - ollama
+    - llama2
