@@ -1,5 +1,10 @@
-Generative AI has been
-TBD
+Generative AI has been all the rage for some time and it seems like this latest entry to the industry's hype cycle will stay with us for the foreseeable future. Between that and the fact that I was looking for an interesting example for a coding dojo at work, I thought it would be interesting to build something that leverages one of the open source LLMs in Rust. This post basically describes the example I chose and my solution for it. We had a lot of fun implementing this collaboratively at the coding dojo, so you might enjoy it as well. :)
+
+The [Ollama](https://ollama.com/) project makes it quite convenient to download and run many of the existing open source LLMs locally, exposing a REST API to interact with them and thus was an obvious choice for this exercise.
+
+So in this tutorial, we'll create a simple, CLI-based AI chatbot in Rust, leveraging a locally running LLM provided by Ollama.
+
+Let's get started!
 
 ## Setup
 
@@ -9,7 +14,7 @@ As mentioned above, we'll use Ollama to run an LLM locally. You can download and
 curl http://localhost:11434/api/chat -d '{
   "model": "llama2",
   "messages": [
-    { "role": "user", "content": "why is the sky blue?" }
+    { "role": "user", "content": "hello AI, what's happenin'?" }
   ]
 }'
 ```
@@ -89,9 +94,9 @@ Then, we read user input line by line from `stdin` and, if it's not empty, handl
             });
 ```
 
-The first thing we do, is add the message the user sends to the LLM to our `messages` vector.
+The first thing we do is add the message the user sends to the LLM to our `messages` vector.
 
-This vector is also what we'll always send to the LLM API endpoint.
+This vector is also what we'll always send to the LLM API endpoint, since it represents the whole conversation context. If we wouldn't do that, each message to the LLM would essentially be without context and always start at the base prompt.
 
 ```rust
 
@@ -106,9 +111,9 @@ This vector is also what we'll always send to the LLM API endpoint.
                 .await?;
 ```
 
-The idea is, that 
+We send the conversation history in the form of `messages` to the `llama2` LLM running on the Ollama REST API.
 
-TBD
+The API, by default, returns the response chunked by words, since the LLM creates the response word-by-word as per it's fundamental mechanisms. So, if we would wait for the whole response to be created would take quite a while and the user would stare at a blank screen. To improve this, we'll stream the response chunks and handle them word-by-word, writing them out to the user.
 
 ```rust
             let mut message = String::default();
@@ -126,7 +131,7 @@ TBD
             }
 ```
 
-TBD
+We also collect the whole response in the `message` String, so we can then add it to the conversation context in `messages`.
 
 ```rust
             if !message.is_empty() {
@@ -145,7 +150,7 @@ Finally, we print the `>` prompt character again for the next input.
         stdout.flush().await?;
 ```
 
-That's it for our little CLI app. Let's test, if it does what we think it should!
+That's it for our little CLI app. Let's test, if it does what we think it does!
 
 ## Testing
 
