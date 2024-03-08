@@ -168,7 +168,7 @@ I apologize, you are correct. Elfriede Jelinek was awarded the Nobel Prize in Li
 > Indeed. Do you also know who won it the year after, in 2005?
 Yes, the Nobel Prize in Literature was awarded to Harold Pinter in 2005.
 > That is correct, awesome! Thank you
-You're welcome! It is always great to learn and share knowledge. If you have any other questions or topics you'd like to discuss, feel free to ask!
+You are welcome! It is always great to learn and share knowledge. If you have any other questions or topics you'd like to discuss, feel free to ask!
 ```
 
 Nice, it works! You can find the full code [here](https://github.com/zupzup/rust-ai-chatbot-ollama).
