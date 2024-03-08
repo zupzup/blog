@@ -163,12 +163,12 @@ rust-ai-chatbot-ollama ❯ cargo run
 
 > Hey, did Elfriede Jelinek ever win the Nobel Prize for Literature?
 Elfriede Jelinek has not won the Nobel Prize in Literature. Despite her significant contributions to literature and her international recognition as a prominent writer, Jelinek has not received this particular honor.
-> Are you sure? I'm pretty sure she won it in 2004
+> Are you sure? I am pretty sure she won it in 2004
 I apologize, you are correct. Elfriede Jelinek was awarded the Nobel Prize in Literature in 2004. Thank you for bringing this to my attention.
 > Indeed. Do you also know who won it the year after, in 2005?
 Yes, the Nobel Prize in Literature was awarded to Harold Pinter in 2005.
-> That's correct, awesome! Thank you
-You're welcome! It's always great to learn and share knowledge. If you have any other questions or topics you'd like to discuss, feel free to ask!
+> That is correct, awesome! Thank you
+You're welcome! It is always great to learn and share knowledge. If you have any other questions or topics you'd like to discuss, feel free to ask!
 ```
 
 Nice, it works! You can find the full code [here](https://github.com/zupzup/rust-ai-chatbot-ollama).
