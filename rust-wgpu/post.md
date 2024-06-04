@@ -423,60 +423,60 @@ In the current version of wgpu, this is an `unsafe` operation if we want to have
 Next, we create a `wgpu::adapter`, which is a handle for the actual graphics card. We’ll just select the default from the GPU `instance` we created above and our created `surface`:
 
 ```rust
-            let adapter = instance
-                .request_adapter(&wgpu::RequestAdapterOptionsBase {
-                    power_preference: wgpu::PowerPreference::default(),
-                    force_fallback_adapter: false,
-                    compatible_surface: Some(&surface),
-                })
-                .await
-                .expect("can create adapter");
+    let adapter = instance
+        .request_adapter(&wgpu::RequestAdapterOptionsBase {
+            power_preference: wgpu::PowerPreference::default(),
+            force_fallback_adapter: false,
+            compatible_surface: Some(&surface),
+        })
+        .await
+        .expect("can create adapter");
 ```
 
 Then, we define a rendering device and a rendering queue for our adapter. Here, we can specify some limits and features. This will become relevant later when we make some changes for the web version of the application:
 
 ```rust
-        let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    label: None,
-                    required_features: wgpu::Features::empty(),
-                    required_limits: limits,
-                },
-                None,
-            )
-            .await
-            .expect("can create a new device");
+    let (device, queue) = adapter
+        .request_device(
+            &wgpu::DeviceDescriptor {
+                label: None,
+                required_features: wgpu::Features::empty(),
+                required_limits: limits,
+            },
+            None,
+        )
+        .await
+        .expect("can create a new device");
 ```
 
 Finally, we define a configuration for our surface, supplying the adapter and the size of the window. There’s a lot more we could specify here, but we’ll stick to defaults for this example:
 
 ```rust
-            let config = surface
-                .get_default_config(&adapter, size.width, size.height)
-                .unwrap();
-    
-            surface.configure(&device, &config);
+    let config = surface
+        .get_default_config(&adapter, size.width, size.height)
+        .unwrap();
+
+    surface.configure(&device, &config);
 ```
 
 Before we come to our shader setup, we’ll set up what we need in terms of text rendering using the `glyphon` crate:
 
 ```rust
-            let mut font_system =
-                FontSystem::new_with_locale_and_db("en-US".into(), glyphon::fontdb::Database::new());
-            let font = include_bytes!("./fonts/font.ttf");
-            let emoji = include_bytes!("./fonts/emoji.ttf");
-            font_system.db_mut().load_font_data(font.to_vec());
-            font_system.db_mut().load_font_data(emoji.to_vec());
-    
-            let text_cache = SwashCache::new();
-            let mut text_atlas = TextAtlas::new(&device, &queue, config.format);
-            let text_renderer = TextRenderer::new(
-                &mut text_atlas,
-                &device,
-                wgpu::MultisampleState::default(),
-                None,
-            );
+    let mut font_system =
+        FontSystem::new_with_locale_and_db("en-US".into(), glyphon::fontdb::Database::new());
+    let font = include_bytes!("./fonts/font.ttf");
+    let emoji = include_bytes!("./fonts/emoji.ttf");
+    font_system.db_mut().load_font_data(font.to_vec());
+    font_system.db_mut().load_font_data(emoji.to_vec());
+
+    let text_cache = SwashCache::new();
+    let mut text_atlas = TextAtlas::new(&device, &queue, config.format);
+    let text_renderer = TextRenderer::new(
+        &mut text_atlas,
+        &device,
+        wgpu::MultisampleState::default(),
+        None,
+    );
 ```
 
 We start by instantiating a `font_system` with the two fonts we added to the project. We initialize the `text_cache`, `text_atlas`, and `text_renderer` with the wgpu rendering pipeline parts we just created. This ensures that we use the same rendering pipeline to render the text as we do for the rest of the application.
@@ -484,10 +484,10 @@ We start by instantiating a `font_system` with the two fonts we added to the pro
 Now, let’s create the rendering pipeline using wgpu, starting with our shader programs:
 
 ```rust
-            let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-                label: None,
-                source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
-            });
+    let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+        label: None,
+        source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
+    });
 ```
 
 We create a shader module for our `device` and specify the `shader.wgsl` file to be used here. Within `shader.wgsl`, we implement both our vertex shader and our fragment shader.
@@ -559,43 +559,43 @@ Of course, for other shapes and other coloring algorithms, you might need anothe
 Let’s continue with our rendering pipeline:
 
 ```rust
-            let render_pipeline_layout =
-                device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                    label: None,
-                    bind_group_layouts: &[],
-                    push_constant_ranges: &[],
-                });
-    
-            let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-                label: None,
-                layout: Some(&render_pipeline_layout),
-                vertex: wgpu::VertexState {
-                    module: &shader,
-                    entry_point: "vertex",
-                    buffers: &[Vertex::desc()],
-                },
-                fragment: Some(wgpu::FragmentState {
-                    module: &shader,
-                    entry_point: "fragment",
-                    targets: &[Some(wgpu::ColorTargetState {
-                        format: config.format,
-                        blend: Some(wgpu::BlendState::REPLACE),
-                        write_mask: wgpu::ColorWrites::ALL,
-                    })],
-                }),
-                primitive: wgpu::PrimitiveState {
-                    topology: wgpu::PrimitiveTopology::TriangleList,
-                    strip_index_format: None,
-                    front_face: wgpu::FrontFace::Ccw,
-                    cull_mode: Some(wgpu::Face::Back),
-                    unclipped_depth: false,
-                    polygon_mode: wgpu::PolygonMode::Fill,
-                    conservative: false,
-                },
-                multisample: wgpu::MultisampleState:default(),
-                depth_stencil: None,
-                multiview: None,
-            });
+    let render_pipeline_layout =
+        device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: None,
+            bind_group_layouts: &[],
+            push_constant_ranges: &[],
+        });
+
+    let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        label: None,
+        layout: Some(&render_pipeline_layout),
+        vertex: wgpu::VertexState {
+            module: &shader,
+            entry_point: "vertex",
+            buffers: &[Vertex::desc()],
+        },
+        fragment: Some(wgpu::FragmentState {
+            module: &shader,
+            entry_point: "fragment",
+            targets: &[Some(wgpu::ColorTargetState {
+                format: config.format,
+                blend: Some(wgpu::BlendState::REPLACE),
+                write_mask: wgpu::ColorWrites::ALL,
+            })],
+        }),
+        primitive: wgpu::PrimitiveState {
+            topology: wgpu::PrimitiveTopology::TriangleList,
+            strip_index_format: None,
+            front_face: wgpu::FrontFace::Ccw,
+            cull_mode: Some(wgpu::Face::Back),
+            unclipped_depth: false,
+            polygon_mode: wgpu::PolygonMode::Fill,
+            conservative: false,
+        },
+        multisample: wgpu::MultisampleState:default(),
+        depth_stencil: None,
+        multiview: None,
+    });
 ```
 
 Here, we configure both our vertex and fragment shaders, as well as the layout of the rendering pipeline. We also see our `VertexBufferLayout` being configured to tell the rendering pipeline the layout of our vertices using `Vertex::desc()`.
@@ -605,24 +605,24 @@ There are quite a few configuration options, most of which we just set to defaul
 The final part of the `State::new()` function is to initialize an empty `components` list (later, we’ll create some components here) and return our newly created `State`:
 
 ```rust
-            let components = vec![];
-    
-            Self {
-                window,
-                surface,
-                device,
-                queue,
-                config,
-                size,
-                render_pipeline,
-                text_atlas,
-                text_cache,
-                text_renderer,
-                font_system,
-                components,
-                input_state,
-            }
+    let components = vec![];
+
+    Self {
+        window,
+        surface,
+        device,
+        queue,
+        config,
+        size,
+        render_pipeline,
+        text_atlas,
+        text_cache,
+        text_renderer,
+        font_system,
+        components,
+        input_state,
     }
+}
 ```
 
 With our wgpu rendering pipeline and application state set up, let’s see how we can render things to the screen.
@@ -632,15 +632,15 @@ With our wgpu rendering pipeline and application state set up, let’s see how w
 We’ll implement the `render()` function as part of `State` as well:
 
 ```rust
-        fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-            let mut text_areas: Vec<TextArea> = Vec::new();
-            let mut vertices: Vec<Vertex> = Vec::new();
-            let mut indices: Vec<u16> = Vec::new();
-    
-            let mut num_vertices = 0;
-            let mut num_indices = 0;
-            
-            ...collect vertices, indices and text areas of components...
+    fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
+        let mut text_areas: Vec<TextArea> = Vec::new();
+        let mut vertices: Vec<Vertex> = Vec::new();
+        let mut indices: Vec<u16> = Vec::new();
+
+        let mut num_vertices = 0;
+        let mut num_indices = 0;
+        
+        ...collect vertices, indices and text areas of components...
 ```
 
 First, we define some vectors to collect all text areas, vertices and indices within the components we want to render. We’ll add the code that does the collection once we implement our GUI components. But what does that mean exactly — to “collect” these things?
@@ -670,40 +670,40 @@ This `indices` array creates a triangle from the three given points. So, by coll
 Next, once we collected all the information we need to pass into the rendering pipeline, we set up a `vertex_buffer` and an `index_buffer` into which we can shove our data:
 
 ```rust
-            let vertex_buffer = self
-                .device
-                .create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                    label: None,
-                    contents: bytemuck::cast_slice(vertices.as_slice()),
-                    usage: wgpu::BufferUsages::VERTEX,
-                });
-    
-            let index_buffer = self
-                .device
-                .create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                    label: None,
-                    contents: bytemuck::cast_slice(&indices),
-                    usage: wgpu::BufferUsages::INDEX,
-                });
+    let vertex_buffer = self
+        .device
+        .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(vertices.as_slice()),
+            usage: wgpu::BufferUsages::VERTEX,
+        });
+
+    let index_buffer = self
+        .device
+        .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(&indices),
+            usage: wgpu::BufferUsages::INDEX,
+        });
 ```
 
 Again, we use `bytemuck` to convert these `Vec` types to the correct data type so that our pipeline can work with them. Also, we need to pass our list of collected `text_areas` to our `text_renderer`:
 
 ```rust
-            self.text_renderer
-                .prepare(
-                    &self.device,
-                    &self.queue,
-                    &mut self.font_system,
-                    &mut self.text_atlas,
-                    Resolution {
-                        width: self.size.width,
-                        height: self.size.height,
-                    },
-                    text_areas,
-                    &mut self.text_cache,
-                )
-                .unwrap();
+    self.text_renderer
+        .prepare(
+            &self.device,
+            &self.queue,
+            &mut self.font_system,
+            &mut self.text_atlas,
+            Resolution {
+                width: self.size.width,
+                height: self.size.height,
+            },
+            text_areas,
+            &mut self.text_cache,
+        )
+        .unwrap();
 ```
 
 Since text rendering is a part of our rendering pipeline, we pass in all the parts of our pipeline our `text_renderer` needs, tell it the size of the window, and provide the `text_areas` to it.
@@ -711,10 +711,10 @@ Since text rendering is a part of our rendering pipeline, we pass in all the par
 Finally, we need to create an `output` and a `view` based on the `text_renderer`. The `output` and `view` are essentially what we’re rendering into. You could say this makes up one rendered frame of our program:
 
 ```rust
-            let output = self.surface.get_current_texture()?;
-            let view = output
-                .texture
-                .create_view(&wgpu::TextureViewDescriptor::default());
+    let output = self.surface.get_current_texture()?;
+    let view = output
+        .texture
+        .create_view(&wgpu::TextureViewDescriptor::default());
 ```
 
 Then, to be able to connect all parts of our rendering pipeline configuration — the shaders, our vertex and index buffers, the just created frame to render into, etc. — we need to create a wgpu command encoder. 
@@ -722,40 +722,40 @@ Then, to be able to connect all parts of our rendering pipeline configuration �
 This command encoder will generate the actual commands to send to the GPU to render our scene. Within this command encoder, we can define several render passes, but in our case, we only need one:
 
 ```rust
-            let mut encoder = self
-                .device
-                .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-    
-            {
-                let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                    label: None,
-                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                        view: &view,
-                        resolve_target: None,
-                        ops: wgpu::Operations {
-                            load: wgpu::LoadOp::Clear(wgpu::Color {
-                                r: 1.0,
-                                g: 1.0,
-                                b: 1.0,
-                                a: 1.0,
-                            }),
-                            store: wgpu::StoreOp::Store,
-                        },
-                    })],
-                    depth_stencil_attachment: None,
-                    timestamp_writes: None,
-                    occlusion_query_set: None,
-                });
-    
-                render_pass.set_pipeline(&self.render_pipeline);
-                render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
-                render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-                render_pass.draw_indexed(0..num_indices, 0, 0..1);
-    
-                self.text_renderer
-                    .render(&self.text_atlas, &mut render_pass)
-                    .unwrap();
-            }
+    let mut encoder = self
+        .device
+        .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+
+    {
+        let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: None,
+            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                view: &view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 1.0,
+                        g: 1.0,
+                        b: 1.0,
+                        a: 1.0,
+                    }),
+                    store: wgpu::StoreOp::Store,
+                },
+            })],
+            depth_stencil_attachment: None,
+            timestamp_writes: None,
+            occlusion_query_set: None,
+        });
+
+        render_pass.set_pipeline(&self.render_pipeline);
+        render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
+        render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+        render_pass.draw_indexed(0..num_indices, 0, 0..1);
+
+        self.text_renderer
+            .render(&self.text_atlas, &mut render_pass)
+            .unwrap();
+    }
 ```
 
 We configure our render pass to take some defaults and to use white (a value of `1.0` for `r`, `g`, `b`, and `a`, respectively) as a clean background color.
@@ -767,14 +767,14 @@ We also call the rendering function of the `text_renderer` from `glyphon`, passi
 Finally, we send these encoded GPU commands to the GPU queue and schedule the rendered texture to be shown as the surface’s texture (`output`), concluding the rendering process:
 
 ```rust
-            self.queue.submit(std::iter::once(encoder.finish()));
-    
-            output.present();
-            self.text_atlas.trim();
-    
-            Ok(())
-        }
+        self.queue.submit(std::iter::once(encoder.finish()));
+
+        output.present();
+        self.text_atlas.trim();
+
+        Ok(())
     }
+}
 ```
 
 Nice. We have a rendering pipeline, an application state, and a way to render to a screen. Next, let’s look at how we handle some input using the Winit event loop.
@@ -784,33 +784,33 @@ Nice. We have a rendering pipeline, an application state, and a way to render to
 Back in the `run_app` function in `lib.rs`, we run our created Winit `event_loop` as the next step:
 
 ```rust
-        event_loop
-            .run(move |event, elwt| match event {
-                UserEvent(ev) => handle_success_event(&mut state, &ev),
-                Event::WindowEvent { window_id, event }
-                    if window_id == state.window().id() && !state.input(&event, elwt) =>
-                {
-                    match event {
-                        WindowEvent::CloseRequested => elwt.exit(),
-                        WindowEvent::Resized(physical_size) => {
-                            state.resize(physical_size);
+    event_loop
+        .run(move |event, elwt| match event {
+            UserEvent(ev) => handle_success_event(&mut state, &ev),
+            Event::WindowEvent { window_id, event }
+                if window_id == state.window().id() && !state.input(&event, elwt) =>
+            {
+                match event {
+                    WindowEvent::CloseRequested => elwt.exit(),
+                    WindowEvent::Resized(physical_size) => {
+                        state.resize(physical_size);
+                    }
+                    WindowEvent::RedrawRequested => {
+                        match state.render() {
+                            Ok(_) => {}
+                            Err(wgpu::SurfaceError::OutOfMemory) => elwt.exit(),
+                            Err(e) => log::error!("render error: {e:?}"),
                         }
-                        WindowEvent::RedrawRequested => {
-                            match state.render() {
-                                Ok(_) => {}
-                                Err(wgpu::SurfaceError::OutOfMemory) => elwt.exit(),
-                                Err(e) => log::error!("render error: {e:?}"),
-                            }
-                        }
-                        _ => (),
-                    };
-                }
-                Event::AboutToWait => {
-                    state.window.request_redraw();
-                }
-                _ => (),
-            })
-            .expect("event loop runs");
+                    }
+                    _ => (),
+                };
+            }
+            Event::AboutToWait => {
+                state.window.request_redraw();
+            }
+            _ => (),
+        })
+        .expect("event loop runs");
 ```
 
 We start out by running the event loop and matching on incoming events. If the event is our custom event — in our case, a `GUIEvent` called `UserEvent` — then we call a custom handler. We’ll look at the implementation of the `handle_success_event` function later on when we implement our GUI components.
@@ -820,49 +820,49 @@ If the event is a `WindowEvent` and it concerns the current window, we call the 
 On closing the window, we simply quit the app. On a request redraw, we call `render()`. Finally, on a resize event, we call our `resize()` function, which sets the new size and reconfigures our `Surface` accordingly:
 
 ```rust
-        fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
-            if new_size.width > 0 && new_size.height > 0 {
-                self.size = new_size;
-                self.config.width = new_size.width;
-                self.config.height = new_size.height;
-                self.surface.configure(&self.device, &self.config);
-            }
+    fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
+        if new_size.width > 0 && new_size.height > 0 {
+            self.size = new_size;
+            self.config.width = new_size.width;
+            self.config.height = new_size.height;
+            self.surface.configure(&self.device, &self.config);
         }
+    }
 ```
 
-Next, let’s look at `State`'s `input()` function, where we handle keyboard and mouse input events:
+Next, let’s look at `State's input()` function, where we handle keyboard and mouse input events:
 
 ```rust
-        fn input(&mut self, event: &WindowEvent, elwt: &EventLoopWindowTarget<GUIEvent>) -> bool {
-            match event {
-                WindowEvent::CursorMoved { position, .. } => {
-                    self.input_state.mouse_coords = position.to_owned();
-                    true
-                }
-                WindowEvent::MouseInput { state, button, .. } => match state {
-                    ElementState::Pressed => {
-                        if button == &winit::event::MouseButton::Left && !self.input_state.clicked {
-                            self.input_state.clicked = true;
-                            self.handle_click();
-                        }
-                        true
-                    }
-                    ElementState::Released => {
-                        if button == &winit::event::MouseButton::Left && self.input_state.clicked {
-                            self.input_state.clicked = false;
-                        }
-                        true
-                    }
-                },
-                WindowEvent::KeyboardInput { event, .. } => {
-                    if let Key::Named(NamedKey::Escape) = event.logical_key {
-                        elwt.exit()
-                    }
-                    true
-                }
-                _ => false,
+    fn input(&mut self, event: &WindowEvent, elwt: &EventLoopWindowTarget<GUIEvent>) -> bool {
+        match event {
+            WindowEvent::CursorMoved { position, .. } => {
+                self.input_state.mouse_coords = position.to_owned();
+                true
             }
+            WindowEvent::MouseInput { state, button, .. } => match state {
+                ElementState::Pressed => {
+                    if button == &winit::event::MouseButton::Left && !self.input_state.clicked {
+                        self.input_state.clicked = true;
+                        self.handle_click();
+                    }
+                    true
+                }
+                ElementState::Released => {
+                    if button == &winit::event::MouseButton::Left && self.input_state.clicked {
+                        self.input_state.clicked = false;
+                    }
+                    true
+                }
+            },
+            WindowEvent::KeyboardInput { event, .. } => {
+                if let Key::Named(NamedKey::Escape) = event.logical_key {
+                    elwt.exit()
+                }
+                true
+            }
+            _ => false,
         }
+    }
 ```
 
 If the mouse cursor moves, we update our mouse position in `State`. 
@@ -915,9 +915,9 @@ Imagine that are four points — A, B, C and D — that make up the edges of the
 To render the rectangle, we need its `vertices` and `indices`. Let’s create methods to get them:
 
 ```rust
-        pub fn indices(&self, base: u16) -> [u16; 6] {
-            [base, 1 + base, 2 + base, base, 2 + base, 3 + base]
-        }
+    pub fn indices(&self, base: u16) -> [u16; 6] {
+        [base, 1 + base, 2 + base, base, 2 + base, 3 + base]
+    }
 ```
 
 Getting the `indices` is pretty straightforward. We count up from the `base`, which is simply `num_indices`, during the collection of all component indices. Then, based on this number, we connect our vertices together — e.g., `[0, 1, 2]` and `[0, 2, 3]` — to create a rectangle.
@@ -925,68 +925,68 @@ Getting the `indices` is pretty straightforward. We count up from the `base`, wh
 For the `vertices`, we need to do a bit more work. We pass in whether the current rectangle is active (e.g. hovered over) as well as the size of the window. We need the size so we can calculate the vertex coordinates based on the pixel coordinates of the given `RectPos`:
 
 ```rust
-        pub fn vertices(
-            &mut self,
-            is_active: bool,
-            size: winit::dpi::PhysicalSize<u32>,
-        ) -> [Vertex; 4] {
-            let top = 1.0 - (self.position.top as f32 / (size.height as f32 / 2.0));
-            let left = (self.position.left as f32 / (size.width as f32 / 2.0)) - 1.0;
-            let bottom = 1.0 - (self.position.bottom as f32 / (size.height as f32 / 2.0));
-            let right = (self.position.right as f32 / (size.width as f32 / 2.0)) - 1.0;
-    
-            let rect = [
-                self.position.top as f32,
-                self.position.left as f32,
-                self.position.bottom as f32,
-                self.position.right as f32,
-            ];
-    
-            let mut color = self.color;
-            let mut border_color = self.border_color;
-            if is_active {
-                color = self.color_active;
-                border_color = self.border_color_active;
-            }
-    
-            //  -1, 1    1,1
-            //  A--------D
-            //  |        |
-            //  |        |
-            //  |        |
-            //  B--------C
-            //  -1, -1   1, -1
-            [
-                Vertex {
-                    // A
-                    position: [left, top, 0.0],
-                    color,
-                    rect,
-                    border_color,
-                },
-                Vertex {
-                    // B
-                    position: [left, bottom, 0.0],
-                    color,
-                    rect,
-                    border_color,
-                },
-                Vertex {
-                    // C
-                    position: [right, bottom, 0.0],
-                    color,
-                    rect,
-                    border_color,
-                },
-                Vertex {
-                    // D
-                    position: [right, top, 0.0],
-                    color,
-                    rect,
-                    border_color,
-                },
-            ]
+    pub fn vertices(
+        &mut self,
+        is_active: bool,
+        size: winit::dpi::PhysicalSize<u32>,
+    ) -> [Vertex; 4] {
+        let top = 1.0 - (self.position.top as f32 / (size.height as f32 / 2.0));
+        let left = (self.position.left as f32 / (size.width as f32 / 2.0)) - 1.0;
+        let bottom = 1.0 - (self.position.bottom as f32 / (size.height as f32 / 2.0));
+        let right = (self.position.right as f32 / (size.width as f32 / 2.0)) - 1.0;
+
+        let rect = [
+            self.position.top as f32,
+            self.position.left as f32,
+            self.position.bottom as f32,
+            self.position.right as f32,
+        ];
+
+        let mut color = self.color;
+        let mut border_color = self.border_color;
+        if is_active {
+            color = self.color_active;
+            border_color = self.border_color_active;
         }
+
+        //  -1, 1    1,1
+        //  A--------D
+        //  |        |
+        //  |        |
+        //  |        |
+        //  B--------C
+        //  -1, -1   1, -1
+        [
+            Vertex {
+                // A
+                position: [left, top, 0.0],
+                color,
+                rect,
+                border_color,
+            },
+            Vertex {
+                // B
+                position: [left, bottom, 0.0],
+                color,
+                rect,
+                border_color,
+            },
+            Vertex {
+                // C
+                position: [right, bottom, 0.0],
+                color,
+                rect,
+                border_color,
+            },
+            Vertex {
+                // D
+                position: [right, top, 0.0],
+                color,
+                rect,
+                border_color,
+            },
+        ]
+    }
 ```
 
 As mentioned above, we need a `position`, `rect`, `color`, and `border_color` for each `Vertex`. The color values are easy, since we have them in our `Rectangle` already. The `rect` is also easy, since it’s essentially just our `RectPos` — the outer pixels of the rectangle.
@@ -996,10 +996,10 @@ However, the `position` is a little more involved. We need to calculate the `pos
 This leads to the following normalization formulas for our vertices:
 
 ```rust
-            let top = 1.0 - (self.position.top as f32 / (size.height as f32 / 2.0));
-            let left = (self.position.left as f32 / (size.width as f32 / 2.0)) - 1.0;
-            let bottom = 1.0 - (self.position.bottom as f32 / (size.height as f32 / 2.0));
-            let right = (self.position.right as f32 / (size.width as f32 / 2.0)) - 1.0;
+    let top = 1.0 - (self.position.top as f32 / (size.height as f32 / 2.0));
+    let left = (self.position.left as f32 / (size.width as f32 / 2.0)) - 1.0;
+    let bottom = 1.0 - (self.position.bottom as f32 / (size.height as f32 / 2.0));
+    let right = (self.position.right as f32 / (size.width as f32 / 2.0)) - 1.0;
 ```
 
 With that, we can set our vertices to the four points of the rectangle:
@@ -1015,13 +1015,13 @@ Now we can also see how our `indices` connect `A-B-C` and `A-C-D` to form two tr
 Finally, we need a way to find out whether the current rectangle is being hovered over:
 
 ```rust
-        pub fn is_hovered(&self, mouse_coords: PhysicalPosition<f64>) -> bool {
-            let rect_pos = self.position;
-            mouse_coords.x > rect_pos.left as f64
-                && mouse_coords.x < rect_pos.right as f64
-                && mouse_coords.y > rect_pos.top as f64
-                && mouse_coords.y < rect_pos.bottom as f64
-        }
+    pub fn is_hovered(&self, mouse_coords: PhysicalPosition<f64>) -> bool {
+        let rect_pos = self.position;
+        mouse_coords.x > rect_pos.left as f64
+            && mouse_coords.x < rect_pos.right as f64
+            && mouse_coords.y > rect_pos.top as f64
+            && mouse_coords.y < rect_pos.bottom as f64
+    }
 ```
 
 Here, we simply check if the mouse coordinates are inside of the rectangle. 
@@ -1081,47 +1081,47 @@ We set the `size`, `text`, `alignment`, `wrapping`, and `scrolling` behavior of 
 Now, in order to render the `Text`, we need to get to the `glyphon::TextArea`. As we saw above, we can then pass the `TextArea` to the `TextRenderer`:
 
 ```rust
-        pub fn text_area(&self, is_active: bool) -> TextArea {
-            let text_width = self.get_text_width();
-            let TextWidth {
-                width,
-                buffer_width,
-            } = text_width;
-    
-            let text_overlap = if width > buffer_width {
-                width - buffer_width
+    pub fn text_area(&self, is_active: bool) -> TextArea {
+        let text_width = self.get_text_width();
+        let TextWidth {
+            width,
+            buffer_width,
+        } = text_width;
+
+        let text_overlap = if width > buffer_width {
+            width - buffer_width
+        } else {
+            0.0
+        };
+
+        TextArea {
+            buffer: &self.buffer,
+            left: self.rect_pos.left as f32 - text_overlap,
+            top: self.top(),
+            scale: 1.0,
+            bounds: self.bounds(),
+            default_color: if is_active {
+                self.color_active
             } else {
-                0.0
-            };
-    
-            TextArea {
-                buffer: &self.buffer,
-                left: self.rect_pos.left as f32 - text_overlap,
-                top: self.top(),
-                scale: 1.0,
-                bounds: self.bounds(),
-                default_color: if is_active {
-                    self.color_active
-                } else {
-                    self.color
-                },
-            }
+                self.color
+            },
         }
     }
+}
 ```
 
 We do this by first calculating the width of the text using a helper, which goes through all layout runs and calculates the maximum width of the rendered text:
 
 ```rust
-        pub fn get_text_width(&self) -> TextWidth {
-            TextWidth {
-                width: self
-                    .buffer
-                    .layout_runs()
-                    .fold(0.0, |width, run| run.line_w.max(width)),
-                buffer_width: self.buffer.size().0,
-            }
+    pub fn get_text_width(&self) -> TextWidth {
+        TextWidth {
+            width: self
+                .buffer
+                .layout_runs()
+                .fold(0.0, |width, run| run.line_w.max(width)),
+            buffer_width: self.buffer.size().0,
         }
+    }
 ```
 
 Then, we calculate the `text_overlap`. This is important because if the text overlaps our text bounds, it will be clipped — i.e., not rendered. So, if we want to see what’s being written beyond the end of the `Text`, we need to calculate how much offset to add to the left side of the bounding box.
@@ -1129,19 +1129,19 @@ Then, we calculate the `text_overlap`. This is important because if the text ove
 Finally, we create the `TextArea`:
 
 ```rust
-        fn bounds(&self) -> TextBounds {
-            TextBounds {
-                left: self.rect_pos.left as i32,
-                top: self.rect_pos.top as i32,
-                right: self.rect_pos.right as i32,
-                bottom: self.rect_pos.bottom as i32,
-            }
+    fn bounds(&self) -> TextBounds {
+        TextBounds {
+            left: self.rect_pos.left as i32,
+            top: self.rect_pos.top as i32,
+            right: self.rect_pos.right as i32,
+            bottom: self.rect_pos.bottom as i32,
         }
-        
-        fn top(&self) -> f32 {
-            (self.rect_pos.bottom - (self.rect_pos.bottom - self.rect_pos.top) / 2) as f32
-                - (self.buffer.metrics().line_height / 2.0)
-        }
+    }
+    
+    fn top(&self) -> f32 {
+        (self.rect_pos.bottom - (self.rect_pos.bottom - self.rect_pos.top) / 2) as f32
+            - (self.buffer.metrics().line_height / 2.0)
+    }
 ```
 
 we calculate the text bounds based on the `RectPos` provided to `Text`, set the text color based on the `active` state, and calculate the `left` and `top` of the text area using the previously calculated `text_overlap`. We also vertically align the text by calculating the vertical center of the text box using the `top()` function.
@@ -1149,14 +1149,14 @@ we calculate the text bounds based on the `RectPos` provided to `Text`, set the 
 The only thing left for the `Text` component is a way to actually set the text content”
 
 ```rust
-        pub fn set_text(&mut self, font_system: &mut FontSystem, text: &str) {
-            self.buffer.set_text(
-                font_system,
-                text,
-                Attrs::new().family(Family::SansSerif),
-                Shaping::Advanced,
-            );
-        }
+    pub fn set_text(&mut self, font_system: &mut FontSystem, text: &str) {
+        self.buffer.set_text(
+            font_system,
+            text,
+            Attrs::new().family(Family::SansSerif),
+            Shaping::Advanced,
+        );
+    }
 ```
 
 The `set_text` function simply pushes the given text into the `buffer`. This means that for the `TextField` component in which we want to be able to type, we’ll need to update the text based on the previous content before calling `set_text`. That’s what we’re going to look at next.
@@ -1209,61 +1209,61 @@ We instantiate a `Text` component as well as a `Rectangle` based on the values g
 As mentioned above, we need a way to add and remove text from the `TextField`. This will ensure users can type in the fiels and remove typed characters using their `b``ackspace` key:
 
 ```rust
-        pub fn add_text(&mut self, font_system: &mut FontSystem, text: &str) {
-            if self.active {
-                self.content.push_str(text);
-                self.text.set_text(font_system, &self.content);
-            }
+    pub fn add_text(&mut self, font_system: &mut FontSystem, text: &str) {
+        if self.active {
+            self.content.push_str(text);
+            self.text.set_text(font_system, &self.content);
         }
-    
-        pub fn remove_character(&mut self, font_system: &mut FontSystem) {
-            if self.active {
-                self.content.pop();
-                self.text.set_text(font_system, &self.content);
-            }
+    }
+
+    pub fn remove_character(&mut self, font_system: &mut FontSystem) {
+        if self.active {
+            self.content.pop();
+            self.text.set_text(font_system, &self.content);
         }
+    }
 ```
 
 Also, we need a way to set the text field to `active` when a user clicks on it:
 
 ```rust
-        pub fn set_active(&mut self) {
-            self.active = true;
-            if self.last_cursor_blink.is_none() {
-                self.last_cursor_blink = Some(SystemTime::now());
-            }
+    pub fn set_active(&mut self) {
+        self.active = true;
+        if self.last_cursor_blink.is_none() {
+            self.last_cursor_blink = Some(SystemTime::now());
         }
-    
-        pub fn set_inactive(&mut self) {
-            self.active = false;
-            self.last_cursor_blink = None;
-        }
+    }
+
+    pub fn set_inactive(&mut self) {
+        self.active = false;
+        self.last_cursor_blink = None;
+    }
 ```
 
 Every time we click outside the text field and back in, we want to reset the blinking cursor. So, we have to set that behavior as well, together with the `active` state. We also need a way to calculate the cursor position to be able to render it:
 
 ```rust
-        pub fn get_cursor(&self) -> Rectangle {
-            let text_width = self.text.get_text_width();
-            let rect_pos = self.rectangle.position;
-            let left = if text_width.width > text_width.buffer_width {
-                rect_pos.right - PADDING
-            } else {
-                rect_pos.left + text_width.width as u32 + PADDING
-            };
-            Rectangle::new(
-                RectPos {
-                    top: rect_pos.top + PADDING,
-                    left,
-                    right: left + CURSOR_WIDTH,
-                    bottom: rect_pos.bottom - PADDING,
-                },
-                [0.0, 0.0, 0.0],
-                [0.0, 0.0, 0.0],
-                [0.0, 0.0, 0.0],
-                [0.0, 0.0, 0.0],
-            )
-        }
+    pub fn get_cursor(&self) -> Rectangle {
+        let text_width = self.text.get_text_width();
+        let rect_pos = self.rectangle.position;
+        let left = if text_width.width > text_width.buffer_width {
+            rect_pos.right - PADDING
+        } else {
+            rect_pos.left + text_width.width as u32 + PADDING
+        };
+        Rectangle::new(
+            RectPos {
+                top: rect_pos.top + PADDING,
+                left,
+                right: left + CURSOR_WIDTH,
+                bottom: rect_pos.bottom - PADDING,
+            },
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+        )
+    }
 ```
 
 We calculate the text width of the contained `Text` component. With some small `PADDING`, we add a small rectangle to the end of the text. This is our blinking cursor, which we create using our `Rectangle` primitive with all colors set to black.
@@ -1331,50 +1331,50 @@ Now that our components are done, let’s look at the changes we need to make to
 With the GUI component implementations in place, we can now instantiate them in the `State::new()` function:
 
 ```rust
-            let events_proxy_clone = event_loop_proxy.clone();
-            let button = button::Button::new(
-                button::ButtonConfig {
-                    rect_pos: RectPos {
-                        top: 125,
-                        left: 100,
-                        bottom: 225,
-                        right: 400,
-                    },
-                    fill_color: [0.5, 0.0, 0.5],
-                    fill_color_active: [1.0, 0.0, 1.0],
-                    border_color: [0.0, 0.0, 0.0],
-                    border_color_active: [0.5, 0.5, 0.5],
-                    text: "Submit 🚀",
-                    text_color: Color::rgb(200, 200, 200),
-                    text_color_active: Color::rgb(255, 255, 255),
-                    on_click: Box::new(move || {
-                        let _ = events_proxy_clone.send_event(GUIEvent::SuccessEvent(Id(1)));
-                    }),
-                },
-                &mut font_system,
-            );
-    
-            let text_field = text_field::TextField::new(
-                text_field::TextFieldConfig {
-                    rect_pos: RectPos {
-                        top: 50,
-                        left: 100,
-                        bottom: 120,
-                        right: 400,
-                    },
-                    fill_color: [0.9, 0.9, 0.9],
-                    fill_color_active: [1.0, 1.0, 1.0],
-                    border_color: [0.3, 0.3, 0.3],
-                    border_color_active: [0.1, 0.1, 0.1],
-                    text_color: Color::rgb(10, 10, 10),
-                },
-                &mut font_system,
-            );
-    
-            let components = vec![
-                Component::Button(Id(0), button),
-                Component::TextField(Id(1), text_field),
-            ];
+    let events_proxy_clone = event_loop_proxy.clone();
+    let button = button::Button::new(
+        button::ButtonConfig {
+            rect_pos: RectPos {
+                top: 125,
+                left: 100,
+                bottom: 225,
+                right: 400,
+            },
+            fill_color: [0.5, 0.0, 0.5],
+            fill_color_active: [1.0, 0.0, 1.0],
+            border_color: [0.0, 0.0, 0.0],
+            border_color_active: [0.5, 0.5, 0.5],
+            text: "Submit 🚀",
+            text_color: Color::rgb(200, 200, 200),
+            text_color_active: Color::rgb(255, 255, 255),
+            on_click: Box::new(move || {
+                let _ = events_proxy_clone.send_event(GUIEvent::SuccessEvent(Id(1)));
+            }),
+        },
+        &mut font_system,
+    );
+
+    let text_field = text_field::TextField::new(
+        text_field::TextFieldConfig {
+            rect_pos: RectPos {
+                top: 50,
+                left: 100,
+                bottom: 120,
+                right: 400,
+            },
+            fill_color: [0.9, 0.9, 0.9],
+            fill_color_active: [1.0, 1.0, 1.0],
+            border_color: [0.3, 0.3, 0.3],
+            border_color_active: [0.1, 0.1, 0.1],
+            text_color: Color::rgb(10, 10, 10),
+        },
+        &mut font_system,
+    );
+
+    let components = vec![
+        Component::Button(Id(0), button),
+        Component::TextField(Id(1), text_field),
+    ];
 ```
 
 First, we create the submit `Button` by setting its position, colors, and text. Also, we use a clone of the `event_loop_proxy` within Winit to create our `on_click` handler, which simply sends a new `GUIEvent::SuccessEvent()` to the event loop.
@@ -1386,28 +1386,28 @@ Then, we create the interactive text field by setting its position and color val
 Alright, now that we implemented and created all of our GUI components, let’s look at the input handling for them. First of all, the `handle_click()` function, which is called whenever the mouse is clicked:
 
 ```rust
-        fn handle_click(&mut self) {
-            self.components
-                .iter_mut()
-                .for_each(|component| match component {
-                    Component::Button(_id, button) => {
-                        if button.rectangle.is_hovered(self.input_state.mouse_coords) {
-                            button.click();
-                        }
+    fn handle_click(&mut self) {
+        self.components
+            .iter_mut()
+            .for_each(|component| match component {
+                Component::Button(_id, button) => {
+                    if button.rectangle.is_hovered(self.input_state.mouse_coords) {
+                        button.click();
                     }
-                    Component::TextField(_id, text_field) => {
-                        if text_field
-                            .rectangle
-                            .is_hovered(self.input_state.mouse_coords)
-                        {
-                            text_field.set_active();
-                        } else {
-                            text_field.set_inactive();
-                        }
+                }
+                Component::TextField(_id, text_field) => {
+                    if text_field
+                        .rectangle
+                        .is_hovered(self.input_state.mouse_coords)
+                    {
+                        text_field.set_active();
+                    } else {
+                        text_field.set_inactive();
                     }
-                    _ => (),
-                });
-        }
+                }
+                _ => (),
+            });
+    }
 ```
 
 On every click, we iterate our components. If it’s a button that’s clicked, we trigger its `on_click` function. If it’s a `TextField`, we simply set it to `active`. If the click is outside the `T``ext``F``ield`, we set it to `inactive` again. This works for every currently rendered component.
@@ -1417,33 +1417,33 @@ Next, let’s look at the keyboard input handling for the `TextField` component.
 If a text field is `active`, we want to display typed characters or remove them if the user presses the `backspace` key. In a real app’s text field, we might want additional functionalities like selecting text and moving the cursor. For our simple example, we’ll just implement these two modes of adding and removing text:
 
 ```rust
-                    self.components // within WindowEvent::KeyboardInput { event, .. }
-                        .iter_mut()
-                        .filter_map(|component| match component {
-                            Component::TextField(_id, text_field) => {
-                                if text_field.active {
-                                    Some(text_field)
-                                } else {
-                                    None
-                                }
-                            }
-                            _ => None,
-                        })
-                        .for_each(|text_field| {
-                            if event.state == ElementState::Pressed {
-                                match event.logical_key.as_ref() {
-                                    Key::Named(NamedKey::Backspace) => {
-                                        text_field.remove_character(&mut self.font_system);
-                                    }
-                                    Key::Named(NamedKey::Enter) => (),
-                                    _ => {
-                                        if let Some(ref txt) = event.text {
-                                            text_field.add_text(&mut self.font_system, txt.as_str());
-                                        }
-                                    }
-                                }
-                            }
-                        });
+    self.components // within WindowEvent::KeyboardInput { event, .. }
+        .iter_mut()
+        .filter_map(|component| match component {
+            Component::TextField(_id, text_field) => {
+                if text_field.active {
+                    Some(text_field)
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        })
+        .for_each(|text_field| {
+            if event.state == ElementState::Pressed {
+                match event.logical_key.as_ref() {
+                    Key::Named(NamedKey::Backspace) => {
+                        text_field.remove_character(&mut self.font_system);
+                    }
+                    Key::Named(NamedKey::Enter) => (),
+                    _ => {
+                        if let Some(ref txt) = event.text {
+                            text_field.add_text(&mut self.font_system, txt.as_str());
+                        }
+                    }
+                }
+            }
+        });
 ```
 
 Again, we iterate all components in `State`, filtering for `active` text fields. Then, for each of those, if a text-based key is pressed, we add that character to the text field or remove it upon backspace. We disable the `Enter` button, but in theory, we could implement some automatic submit logic here.
@@ -1508,84 +1508,84 @@ Alright, that’s it for the component input events. Let’s implement the rende
 To render each of the components, as mentioned before, we must collect their respective `vertices`, `indices`, and `text_areas`. First, we iterate over all components:
 
 ```rust
-            self.components
-                .iter_mut()
-                .for_each(|component| match component {
+    self.components
+        .iter_mut()
+        .for_each(|component| match component {
 ```
 
 If it’s a `Button`, we see if it’s currently hovered on, get its rectangle’s `vertices`, and add them to the `vertices` list. We do the same for the `indices`, then increment the number of vertices and indices so we can correctly calculate the indices for subsequent components. Finally, we add the `text_area` from the `Text` component contained in the `Button` to the `text_areas` vector:
 
 ```rust
-                    Component::Button(_id, button) => {
-                        let button_active = button.is_hovered(self.input_state.mouse_coords);
-                        let button_vertices = button.rectangle.vertices(button_active, self.size);
-    
-                        vertices.extend_from_slice(&button_vertices);
-                        indices.extend_from_slice(&button.rectangle.indices(num_vertices));
-    
-                        num_vertices += button_vertices.len() as u16;
-                        num_indices += rectangle::NUM_INDICES;
-    
-                        text_areas.push(
-                            button
-                                .text
-                                .text_area(button_active && self.input_state.clicked),
-                        );
-                    }
+    Component::Button(_id, button) => {
+        let button_active = button.is_hovered(self.input_state.mouse_coords);
+        let button_vertices = button.rectangle.vertices(button_active, self.size);
+
+        vertices.extend_from_slice(&button_vertices);
+        indices.extend_from_slice(&button.rectangle.indices(num_vertices));
+
+        num_vertices += button_vertices.len() as u16;
+        num_indices += rectangle::NUM_INDICES;
+
+        text_areas.push(
+            button
+                .text
+                .text_area(button_active && self.input_state.clicked),
+        );
+    }
 ```
 
 For the `Text` component, the logic limits itself to just the last part we just saw, adding the inner text area to the list of text areas:
 
 ```rust
-                    Component::Text(_id, text) => text_areas.push(text.text_area(false)),
+    Component::Text(_id, text) => text_areas.push(text.text_area(false)),
 ```
 
 Finally, for the `TextField` component, we must get the vertices and indices from the inner rectangle and the text area from the inner text component. Besides this, there are a few more things we need to do since we have to also render the blinking cursor:
 
 ```rust
-                    Component::TextField(_id, text_field) => {
-                        let text_field_active = text_field.active;
-                        let text_field_vertices =
-                            text_field.rectangle.vertices(text_field_active, self.size);
-    
-                        vertices.extend_from_slice(&text_field_vertices);
-                        indices.extend_from_slice(&text_field.rectangle.indices(num_vertices));
-    
-                        num_vertices += text_field_vertices.len() as u16;
-                        num_indices += rectangle::NUM_INDICES;
-    
-                        let now = SystemTime::now();
-                        if text_field_active
-                            && text_field.last_cursor_blink.is_some_and(|dur| {
-                                now.duration_since(dur).is_ok_and(|duration| {
-                                    duration.as_millis() > text_field::CURSOR_BLINK_TIMEOUT_MS
-                                })
-                            })
-                        {
-                            let mut cursor = text_field.get_cursor();
-                            let cursor_vertices = cursor.vertices(false, self.size);
-    
-                            vertices.extend_from_slice(&cursor_vertices);
-                            indices.extend_from_slice(&text_field.get_cursor().indices(num_vertices));
-    
-                            num_vertices += cursor_vertices.len() as u16;
-                            num_indices += rectangle::NUM_INDICES;
-    
-                            if text_field.last_cursor_blink.is_some_and(|dur| {
-                                now.duration_since(dur).is_ok_and(|duration| {
-                                    duration.as_millis() > text_field::CURSOR_BLINK_TIMEOUT_MS * 2
-                                })
-                            }) {
-                                text_field.last_cursor_blink = Some(SystemTime::now());
-                            }
-                        }
-    
-                        text_areas.push(
-                            text_field
-                                .text
-                                .text_area(text_field_active && self.input_state.clicked),
-                        );
-                    }
+    Component::TextField(_id, text_field) => {
+        let text_field_active = text_field.active;
+        let text_field_vertices =
+            text_field.rectangle.vertices(text_field_active, self.size);
+
+        vertices.extend_from_slice(&text_field_vertices);
+        indices.extend_from_slice(&text_field.rectangle.indices(num_vertices));
+
+        num_vertices += text_field_vertices.len() as u16;
+        num_indices += rectangle::NUM_INDICES;
+
+        let now = SystemTime::now();
+        if text_field_active
+            && text_field.last_cursor_blink.is_some_and(|dur| {
+                now.duration_since(dur).is_ok_and(|duration| {
+                    duration.as_millis() > text_field::CURSOR_BLINK_TIMEOUT_MS
+                })
+            })
+        {
+            let mut cursor = text_field.get_cursor();
+            let cursor_vertices = cursor.vertices(false, self.size);
+
+            vertices.extend_from_slice(&cursor_vertices);
+            indices.extend_from_slice(&text_field.get_cursor().indices(num_vertices));
+
+            num_vertices += cursor_vertices.len() as u16;
+            num_indices += rectangle::NUM_INDICES;
+
+            if text_field.last_cursor_blink.is_some_and(|dur| {
+                now.duration_since(dur).is_ok_and(|duration| {
+                    duration.as_millis() > text_field::CURSOR_BLINK_TIMEOUT_MS * 2
+                })
+            }) {
+                text_field.last_cursor_blink = Some(SystemTime::now());
+            }
+        }
+
+        text_areas.push(
+            text_field
+                .text
+                .text_area(text_field_active && self.input_state.clicked),
+        );
+    }
 ```
 
 The first and last part is the same as for `Button`, but in the middle we see the logic for the cursor. If the text field is `active`, we have to calculate when the cursor last blinked. If that was more than `500 ms` ago, we render it. Otherwise, we let it disappear to create a continuous blinking effect.
@@ -1614,20 +1614,20 @@ In the `lib.rs` and `text.rs` files, we use a different `SystemTime` implementat
 In `State::new()` within the `lib.rs` file, we’ll change the size to use fixed values since we have a `Canvas` of a fixed size. We also set the backend to `GL`, since we’ll be using the `WebGL` backend to render to. This will allow us to look at the result in all available modern browsers:
 
 ```rust
-            cfg_if::cfg_if! {
-                if #[cfg(target_arch = "wasm32")] {
-                    let size = winit::dpi::PhysicalSize::new(500, 500);
-                    let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
-                        backends: wgpu::Backends::GL,
-                        ..Default::default()
-                    });
-                    let limits = wgpu::Limits::downlevel_webgl2_defaults();
-                } else {
-                    let size = window.inner_size();
-                    let instance = wgpu::Instance::default();
-                    let limits = wgpu::Limits::default();
-                }
-            }
+    cfg_if::cfg_if! {
+        if #[cfg(target_arch = "wasm32")] {
+            let size = winit::dpi::PhysicalSize::new(500, 500);
+            let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+                backends: wgpu::Backends::GL,
+                ..Default::default()
+            });
+            let limits = wgpu::Limits::downlevel_webgl2_defaults();
+        } else {
+            let size = window.inner_size();
+            let instance = wgpu::Instance::default();
+            let limits = wgpu::Limits::default();
+        }
+    }
 ```
 
 In the `run()` function within the `lib.rs` file, we’ll configure a different logger, so the browser’s `console.log` is used for logging. We’ll also set up the `Canvas` element for the web version to render into:
