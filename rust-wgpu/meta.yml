@@ -1,0 +1,7 @@
+title: "Leverage Rust and wgpu for effective cross-platform graphics"
+short: "In this post, we'll check out wgpu and see how we can build a very basic GUI out of triangles using the GPU."
+date: 11.06.2024
+tags:
+    - rust
+    - wgpu
+canonical: https://blog.logrocket.com/rust-wgpu-cross-platform-graphics/
