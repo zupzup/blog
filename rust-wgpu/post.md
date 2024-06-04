@@ -1,7 +1,5 @@
 *This post was originally posted on the [LogRocket](https://blog.logrocket.com/rust-wgpu-cross-platform-graphics/) blog on 28.05.2024 and was cross-posted here by the author.*
 
-# Cross-platform Graphics in Rust using Wgpu
-
 Understanding how to work directly with the new WebGPU standard requires more knowledge than higher-level graphics libraries that abstract complex development concepts for easier usage. However, this knowledge also comes with benefits like a higher level of control, better cross-platform performance, and more efficient bug-solving.
 
 This article will showcase how to use [the](https://wgpu.rs/) [w](https://wgpu.rs/)[gpu crate](https://wgpu.rs/) to set up a GPU-based rendering pipeline and how to construct a basic user interface with it. Whether your project has intensive graphics processing needs or not, this step-by-step tutorial can offer useful and interesting knowledge to help you develop more effectively.
@@ -336,7 +334,7 @@ That looks complicated, but it’s really not — just read through it slowly, l
 
 For example, our `position` was three `f23` values, starting at the beginning — that is, `offset: 0`. The `shader_location` is how we can reference this value in the shader program later on. You’ll see this line of code:
 
-```bash
+```wgsl
     @location(0) position: vec3<f32>
 ```
 
@@ -496,7 +494,7 @@ We create a shader module for our `device` and specify the `shader.wgsl` file to
 
 Let’s look at the vertex shader first. It’s responsible for where the pixels should be drawn, corresponding to the vertices we send over:
 
-```bash
+```wgsl
     struct VertexInput {
         @location(0) position: vec3<f32>,
         @location(1) color: vec3<f32>,
@@ -532,7 +530,7 @@ We also define `VertexOutput`, which is the data that will be returned from the 
 
 The fragment shader, which we use to figure out the color of each pixel, has some more interesting logic in our case. Let’s look at it:
 
-```bash
+```wgsl
     @fragment
     fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
         var border_width: f32 = 2.0;
