@@ -334,7 +334,7 @@ That looks complicated, but it’s really not — just read through it slowly, l
 
 For example, our `position` was three `f23` values, starting at the beginning — that is, `offset: 0`. The `shader_location` is how we can reference this value in the shader program later on. You’ll see this line of code:
 
-```wgsl
+```bash
     @location(0) position: vec3<f32>
 ```
 
@@ -494,7 +494,7 @@ We create a shader module for our `device` and specify the `shader.wgsl` file to
 
 Let’s look at the vertex shader first. It’s responsible for where the pixels should be drawn, corresponding to the vertices we send over:
 
-```wgsl
+```bash
     struct VertexInput {
         @location(0) position: vec3<f32>,
         @location(1) color: vec3<f32>,
@@ -530,7 +530,7 @@ We also define `VertexOutput`, which is the data that will be returned from the 
 
 The fragment shader, which we use to figure out the color of each pixel, has some more interesting logic in our case. Let’s look at it:
 
-```wgsl
+```bash
     @fragment
     fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
         var border_width: f32 = 2.0;
