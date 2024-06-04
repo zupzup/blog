@@ -89,8 +89,8 @@ Since we’re going to build a simple GUI app, we’ll create several components
 
 - src/
   - fonts/ // custom font
-    - emoji.ttf
-    - font.ttf
+     - emoji.ttf
+     - font.ttf
   - main.rs // entry point for the native application
   - lib.rs // wgpu setup and GUI logic
   - button.rs // Button component
