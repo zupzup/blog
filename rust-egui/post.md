@@ -574,10 +574,11 @@ Since we can only use types that implement the `eframe::App` trait within `efram
 
 The implementation consists only of the `update` function, which has the following signature:
 
-- `fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame)`
+```rust
+fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame)`
+```
 
 It takes a `Context` and a `Frame`, which we won’t need. But you probably can remember the `Context`, since that’s what we used earlier to trigger a repaint in the rendering thread. So anytime we call `context.request_repaint()`, this `update` function is called again:
-
 
 ```rust
 impl eframe::App for PetApp {
