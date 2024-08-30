@@ -1,0 +1,8 @@
+title: "Building cross-platform GUI apps in Rust using egui"
+short: "In this post, we'll build a simple cross-platform GUI using Rust and egui."
+date: 06.09.2024
+tags:
+    - rust
+    - egui
+    - gui
+canonical: https://blog.logrocket.com/building-cross-platform-gui-apps-rust-using-egui/
