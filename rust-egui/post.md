@@ -50,7 +50,8 @@ Another interesting aspect of egui is that it integrates [AccessKit](https://acc
 
 Even though AccessKit, at the time of writing, doesn’t have a fully functioning implementation for the web, it looks like a very promising project to make implementing accessibility features for each platform a lot easier.
 
-**[H3] Cross-platform and the** **w****eb**
+### Cross-platform and the web
+
 As mentioned in the beginning, the goal of `egui` is to be a cross-platform GUI application library. Using [eframe_template](https://github.com/emilk/eframe_template), one is able to build applications for Linux, Mac, Windows, Android and the web using WebGL/WebGPU and WASM.
 
 Support for the different platforms is still in a maturing phase, but for desktop it works stably already. Due to the approach when it comes to the web, there are some [limitations](https://github.com/emilk/egui/tree/master/crates/eframe#limitations-when-running-egui-on-the-web), so egui is certainly not a replacement for building any and all web applications, but it also doesn’t try to be or advertise itself as such.
