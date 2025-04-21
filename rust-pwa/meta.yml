@@ -1,0 +1,9 @@
+title: "Building progressive web apps using Rust"
+short: "In this post, we'll build a simple Progressive Web App using Rust."
+date: 25.04.2025
+tags:
+    - rust
+    - pwa
+    - nostr
+    - surrealdb
+canonical: https://blog.logrocket.com/building-progressive-web-apps-rust/
