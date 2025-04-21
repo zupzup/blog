@@ -45,31 +45,31 @@ To follow along, all you need is a reasonably recent Rust installation. 1.85 bei
 First, create a new Rust project:
 
 ```bash
-    cargo new rust-pwa-example
-    cd rust-pwa-example
+cargo new rust-pwa-example
+cd rust-pwa-example
 ```
 
 Next, edit the `Cargo.toml` file and add the dependencies you'll need:
 
 ```toml
-    [dependencies]
-    
-    [lib]
-    crate-type = ["cdylib"]
-    
-    [dependencies]
-    serde = "1.0"
-    serde-wasm-bindgen = "0.6"
-    ecies = { version = "0.2", default-features = false, features = ["pure"] }
-    hex = "0.4"
-    surrealdb = { version = "2.2", features = ["kv-indxdb"] }
-    getrandom = { version = "0.3", features = ["wasm_js"] }
-    wasm-bindgen = "0.2"
-    wasm-bindgen-futures = "0.4"
-    nostr-sdk = "0.39"
-    console_error_panic_hook = "0.1"
-    console_log = { version = "1.0", features = ["color"] }
-    log = "0.4"
+[dependencies]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+serde = "1.0"
+serde-wasm-bindgen = "0.6"
+ecies = { version = "0.2", default-features = false, features = ["pure"] }
+hex = "0.4"
+surrealdb = { version = "2.2", features = ["kv-indxdb"] }
+getrandom = { version = "0.3", features = ["wasm_js"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+nostr-sdk = "0.39"
+console_error_panic_hook = "0.1"
+console_log = { version = "1.0", features = ["color"] }
+log = "0.4"
 ```
 
 We use `serde` and `serde-wasm-bindgen` for serialization between Rust and JavaScript/TypeScript. As mentioned above, we’re going to encrypt messages and images, and we’ll use the `ecies` and `hex` crates to do so.
@@ -83,45 +83,45 @@ Since we’re not only building a WASM-based Rust project but will embed this wi
 We’ll start with a basic `index.html` file:
 
 ```html
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="#000000">
-        <link rel="manifest" href="/manifest.json">
-        <title>Example PWA with Rust</title>
-    </head>
-    <body>
-        <h1>Example PWA using Rust</h1>
-        <script type="module" src="/main.js"></script>
-    </body>
-    </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="/manifest.json">
+    <title>Example PWA with Rust</title>
+</head>
+<body>
+    <h1>Example PWA using Rust</h1>
+    <script type="module" src="/main.js"></script>
+</body>
+</html>
 ```
 
 This references a basic `main.js`, which can stay empty for now, and a `manifest.json`, which we’ll create next:
 
 ```json
-    {
-        "short_name": "RustExamplePWA",
-        "name": "Rust Example Progressive Web App",
-        "icons": [
-            {
-                "src": "img/logo_192x192.png",
-                "sizes": "192x192",
-                "type": "image/png"
-            },
-            {
-                "src": "img/logo_512x512.png",
-                "sizes": "512x512",
-                "type": "image/png"
-            }
-        ],
-        "start_url": "/",
-        "background_color": "#000000",
-        "theme_color": "#dddddd",
-        "display": "standalone"
-    }
+{
+    "short_name": "RustExamplePWA",
+    "name": "Rust Example Progressive Web App",
+    "icons": [
+        {
+            "src": "img/logo_192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "img/logo_512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "/",
+    "background_color": "#000000",
+    "theme_color": "#dddddd",
+    "display": "standalone"
+}
 ```
 
 Here, we define the name, short name, icons, and some other settings for the progressive web app. This is relevant for the case where the app is installed locally on a phone.
@@ -129,21 +129,21 @@ Here, we define the name, short name, icons, and some other settings for the pro
 And the following `service-worker.js`:
 
 ```javascript
-    self.addEventListener("install", (event) => {
-        event.waitUntil(
-            caches.open("pwa-cache").then((cache) => {
-                return cache.addAll(["/", "/index.html", "/main.js", "/img/logo_192x192.png", "/img/logo_512x512.png", "/pkg/index.js", "/pkg/index_bg.wasm"]);
-            })
-        );
-    });
-    
-    self.addEventListener("fetch", (event) => {
-        event.respondWith(
-            caches.match(event.request).then((response) => {
-                return response || fetch(event.request);
-            })
-        );
-    });
+self.addEventListener("install", (event) => {
+    event.waitUntil(
+        caches.open("pwa-cache").then((cache) => {
+            return cache.addAll(["/", "/index.html", "/main.js", "/img/logo_192x192.png", "/img/logo_512x512.png", "/pkg/index.js", "/pkg/index_bg.wasm"]);
+        })
+    );
+});
+
+self.addEventListener("fetch", (event) => {
+    event.respondWith(
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
+        })
+    );
+});
 ```
 
 The only thing we add here is that if the app is installed, all relevant files are cached, so the app works fully offline. The files include the manually created files and the generated Wasm files.
@@ -161,15 +161,15 @@ That’s it for the initial setup. Let’s get to the Wasm build pipeline next s
 To build a Wasm binary that can be used in the browser from our Rust code, we use the [wasm-pack](https://rustwasm.github.io/wasm-pack/) tool, and we have to compile to the `wasm32-unknown-unknown` target, which can be added to your local Rust installation like this:
  
 ```bash
-    rustup target add wasm32-unknown-unknown
+rustup target add wasm32-unknown-unknown
 ```
 
 Also, in `.cargo/config.toml`, we need to add some additional flags:
 
 ```toml
-    [build]
-    target = "wasm32-unknown-unknown"
-    rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]
+[build]
+target = "wasm32-unknown-unknown"
+rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]
 ```
 
 This configures what `cargo`, when run inside of this project, uses by default.
@@ -189,76 +189,76 @@ When building our app, we’ll start with the SurrealDB-based storage layer. The
 For this purpose, we’ll use a `thread_local` variable to keep the database connection around. To be able to initialize it and re-use it, we use a `RefCell` with an `Option` to the database connection inside:
 
 ```rust
-    use surrealdb::{engine::any::Any, Surreal};
-    use std::cell::RefCell;
-    
-    thread_local! {
-        static SURREAL_DB: RefCell<Option<Surreal<Any>>> = const { RefCell::new(None) };
-    }
+use surrealdb::{engine::any::Any, Surreal};
+use std::cell::RefCell;
+
+thread_local! {
+    static SURREAL_DB: RefCell<Option<Surreal<Any>>> = const { RefCell::new(None) };
+}
 ```
 
 Using this, we can now initialize the database and create a `get_db()` function, with which we can get a handle to it in any other API function:
 
 ```rust
-    async fn init_surreal_db() {
-        let db = surrealdb::engine::any::connect("indxdb://default")
-            .await
-            .unwrap();
-        db.use_ns("").use_db("default").await.unwrap();
-        SURREAL_DB.with(|surreal_db| {
-            let mut db_ref = surreal_db.borrow_mut();
-            if db_ref.is_none() {
-                *db_ref = Some(db);
-            }
-        });
-    }
-    
-    fn get_db() -> Surreal<Any> {
-        SURREAL_DB
-            .with(|db| db.borrow().clone())
-            .expect("is initialized")
-    }
+async fn init_surreal_db() {
+    let db = surrealdb::engine::any::connect("indxdb://default")
+        .await
+        .unwrap();
+    db.use_ns("").use_db("default").await.unwrap();
+    SURREAL_DB.with(|surreal_db| {
+        let mut db_ref = surreal_db.borrow_mut();
+        if db_ref.is_none() {
+            *db_ref = Some(db);
+        }
+    });
+}
+
+fn get_db() -> Surreal<Any> {
+    SURREAL_DB
+        .with(|db| db.borrow().clone())
+        .expect("is initialized")
+}
 ```
 
 Above, we initialized a connection to IndexedDB. Then we also initialize logging so we can log from Rust to the browser:
 
 ```rust
-    fn init_logging() {
-        std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-        console_log::init_with_level(log::Level::Info).unwrap();
-    }
+fn init_logging() {
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    console_log::init_with_level(log::Level::Info).unwrap();
+}
 ```
 
 We also call our init functions within an `initialize()` function, which we expose to JS/TS via `wasm_bindgen`:
 
 ```rust
-    #[wasm_bindgen]
-    pub async fn initialize() {
-        init_logging();
-        init_surreal_db().await;
-    }
+#[wasm_bindgen]
+pub async fn initialize() {
+    init_logging();
+    init_surreal_db().await;
+}
 ```
 
 Once we build this app, in the `main.js` file we generated before, we can import the `initialize` function and call it:
 
 ```rust
-    import init, {
-        initialize,
-    } from '../pkg/index.js';
-    
-    async function run() {
-        await init();
-        await initialize();
-    }
-    
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-            .register("/service-worker.js")
-            .then(() => console.log("registered service worker"))
-            .catch((err) => console.error("registration of service worker failed", err));
-    }
-    
-    await run();
+import init, {
+    initialize,
+} from '../pkg/index.js';
+
+async function run() {
+    await init();
+    await initialize();
+}
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+        .register("/service-worker.js")
+        .then(() => console.log("registered service worker"))
+        .catch((err) => console.error("registration of service worker failed", err));
+}
+
+await run();
 ```
 
 Above, we initialized the `serviceWorker` that we defined before, initializing `wasm` using the `init()` function, and initializing our API using our exported `initialized()` function.
@@ -266,22 +266,22 @@ Above, we initialized the `serviceWorker` that we defined before, initializing `
 This should serve well as a basis for our API layer. Let’s implement encryption next:
 
 ```rust
-    use ecies::utils::generate_keypair;
-    use serde::{Deserialize, Serialize};
-    
-    #[derive(Serialize, Deserialize, Clone)]
-    pub struct Keys {
-        pub sk: String,
-        pub pk: String,
+use ecies::utils::generate_keypair;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Keys {
+    pub sk: String,
+    pub pk: String,
+}
+
+pub fn generate_encryption_keys() -> Keys {
+    let (sk, pk) = generate_keypair();
+    Keys {
+        sk: hex::encode(sk.serialize()),
+        pk: hex::encode(pk.serialize()),
     }
-    
-    pub fn generate_encryption_keys() -> Keys {
-        let (sk, pk) = generate_keypair();
-        Keys {
-            sk: hex::encode(sk.serialize()),
-            pk: hex::encode(pk.serialize()),
-        }
-    }
+}
 ```
 
 We define a `Keys` struct for storing and retrieving keys and a function to create a new ECIES key pair.
@@ -289,20 +289,20 @@ We define a `Keys` struct for storing and retrieving keys and a function to crea
 Then, we implement the persistence logic so we can both fetch these keys from the database and also store a key pair there:
 
 ```rust
-    async fn get_encryption_keys_from_db() -> Option<Keys> {
-        let db = get_db();
-        let res: Option<Keys> = db.select(("keys", "encryption")).await.unwrap();
-        res
-    }
-    
-    async fn save_encryption_keys_to_db(keys: &Keys) {
-        let db = get_db();
-        let _: Option<Keys> = db
-            .create(("keys", "encryption"))
-            .content(keys.clone())
-            .await
-            .unwrap();
-    }
+async fn get_encryption_keys_from_db() -> Option<Keys> {
+    let db = get_db();
+    let res: Option<Keys> = db.select(("keys", "encryption")).await.unwrap();
+    res
+}
+
+async fn save_encryption_keys_to_db(keys: &Keys) {
+    let db = get_db();
+    let _: Option<Keys> = db
+        .create(("keys", "encryption"))
+        .content(keys.clone())
+        .await
+        .unwrap();
+}
 ```
 
 We use the above-defined `get_db()` function to get our stored DB connection and use the SQL-like SurrealDB SDK API to save keys to and fetch from the `keys` table.
@@ -310,9 +310,9 @@ We use the above-defined `get_db()` function to get our stored DB connection and
 In `lib.rs/initialize`, we generate the keys on startup and save them in the database:
 
 ```rust
-    ...
-            save_encryption_keys_to_db(&generate_encryption_keys()).await;
-    ...
+...
+save_encryption_keys_to_db(&generate_encryption_keys()).await;
+...
 ```
 
 Now that our basic key management is implemented (of course, in a real, production application, we wouldn’t just save the private key as plaintext in the database, but rather use an API such as the [Web Crypto API](https://www.w3.org/TR/WebCryptoAPI/#concepts-key-storage)).
@@ -320,16 +320,16 @@ Now that our basic key management is implemented (of course, in a real, producti
 Next, let’s implement utility functions for encrypting and decrypting bytes:
 
 ```rust
-    fn encrypt(input: &[u8], key: &str) -> Vec<u8> {
-        let decoded_key = hex::decode(key).unwrap();
-        ecies::encrypt(&decoded_key, input).unwrap()
-    }
-    
-    fn decrypt(input: &[u8], key: &str) -> Vec<u8> {
-        let decoded_key = hex::decode(key).unwrap();
-        let decoded_msg = input;
-        ecies::decrypt(&decoded_key, &decoded_msg).unwrap()
-    }
+fn encrypt(input: &[u8], key: &str) -> Vec<u8> {
+    let decoded_key = hex::decode(key).unwrap();
+    ecies::encrypt(&decoded_key, input).unwrap()
+}
+
+fn decrypt(input: &[u8], key: &str) -> Vec<u8> {
+    let decoded_key = hex::decode(key).unwrap();
+    let decoded_msg = input;
+    ecies::decrypt(&decoded_key, &decoded_msg).unwrap()
+}
 ```
 
 We simply use the `ecies` crate API, with the public and private key passed in as hex-encoded strings to implement encryption and decryption.
@@ -339,46 +339,46 @@ Now that we have the basics of storage and encryption in place, let’s get to e
 First, let’s define some basic data types:
 
 ```rust
-    #[derive(Serialize, Deserialize, Clone)]
-    pub struct Message {
-        pub msg: String,
-    }
-    
-    #[derive(Serialize, Deserialize, Clone)]
-    pub struct File {
-        pub name: String,
-        pub bytes: Vec<u8>,
-    }
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Message {
+    pub msg: String,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct File {
+    pub name: String,
+    pub bytes: Vec<u8>,
+}
 ```
 
 Then, we start by implementing a function to fetch all local messages from a `msg` table and a function that we expose, which gets the encryption keys, fetches the messages, decrypts them, and serializes them so they can be used from JavaScript/TypeScript. Let’s take a look:
 
 ```rust
-    use wasm_bindgen::prelude::*;
-    
-    async fn fetch_messages() -> Vec<Message> {
-        let db = get_db();
-        let msgs: Vec<Message> = db.select("msg").await.unwrap();
-        msgs
-    }
-    
-    #[wasm_bindgen]
-    pub async fn fetch_and_decrypt_local_messages() -> JsValue {
-        let encryption_keys = get_encryption_keys_from_db().await.unwrap();
-        let msgs = fetch_messages().await;
-        let decrypted: Vec<String> = msgs
-            .into_iter()
-            .map(|msg| {
-                std::str::from_utf8(&decrypt(
-                    &hex::decode(msg.msg.as_bytes()).unwrap(),
-                    &encryption_keys.sk,
-                ))
-                .unwrap()
-                .to_owned()
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&decrypted).unwrap()
-    }
+use wasm_bindgen::prelude::*;
+
+async fn fetch_messages() -> Vec<Message> {
+    let db = get_db();
+    let msgs: Vec<Message> = db.select("msg").await.unwrap();
+    msgs
+}
+
+#[wasm_bindgen]
+pub async fn fetch_and_decrypt_local_messages() -> JsValue {
+    let encryption_keys = get_encryption_keys_from_db().await.unwrap();
+    let msgs = fetch_messages().await;
+    let decrypted: Vec<String> = msgs
+        .into_iter()
+        .map(|msg| {
+            std::str::from_utf8(&decrypt(
+                &hex::decode(msg.msg.as_bytes()).unwrap(),
+                &encryption_keys.sk,
+            ))
+            .unwrap()
+            .to_owned()
+        })
+        .collect();
+    serde_wasm_bindgen::to_value(&decrypted).unwrap()
+}
 ```
 
 The database fetching is the same as with the keys — nothing too interesting here. But when we check out the `fetch_and_decrypt_local_messages` function, which is annotated using `wasm_bindgen` again, thus being exposed to JS/TS, it has a `JsValue` as a return value.
@@ -394,31 +394,31 @@ Finally, we use `serde_wasm_bindgen` to serialize the `Vec<String>` to be used i
 Cool! We’ll implement saving messages later when we implement our network layer. Now, though, we still have our images to take care of. We can just re-use the logic we used before to implement encrypting and storing and retrieving and decrypting images to and from the storage:
 
 ```rust
-    #[wasm_bindgen]
-    pub async fn save_image(file_name: &str, file_bytes: Vec<u8>) {
-        let encryption_keys = get_encryption_keys_from_db().await.unwrap();
-        let db = get_db();
-        let f = File {
-            name: file_name.to_owned(),
-            bytes: encrypt(&file_bytes, &encryption_keys.pk),
-        };
-        let _: Option<File> = db.create("img").content(f).await.unwrap();
-    }
-    
-    #[wasm_bindgen]
-    pub async fn fetch_images() -> JsValue {
-        let encryption_keys = get_encryption_keys_from_db().await.unwrap();
-        let db = get_db();
-        let files: Vec<File> = db.select("img").await.unwrap();
-        let decrypted: Vec<File> = files
-            .into_iter()
-            .map(|f| File {
-                name: f.name,
-                bytes: decrypt(&f.bytes, &encryption_keys.sk),
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&decrypted).unwrap()
-    }
+#[wasm_bindgen]
+pub async fn save_image(file_name: &str, file_bytes: Vec<u8>) {
+    let encryption_keys = get_encryption_keys_from_db().await.unwrap();
+    let db = get_db();
+    let f = File {
+        name: file_name.to_owned(),
+        bytes: encrypt(&file_bytes, &encryption_keys.pk),
+    };
+    let _: Option<File> = db.create("img").content(f).await.unwrap();
+}
+
+#[wasm_bindgen]
+pub async fn fetch_images() -> JsValue {
+    let encryption_keys = get_encryption_keys_from_db().await.unwrap();
+    let db = get_db();
+    let files: Vec<File> = db.select("img").await.unwrap();
+    let decrypted: Vec<File> = files
+        .into_iter()
+        .map(|f| File {
+            name: f.name,
+            bytes: decrypt(&f.bytes, &encryption_keys.sk),
+        })
+        .collect();
+    serde_wasm_bindgen::to_value(&decrypted).unwrap()
+}
 ```
 
 We fetch the encryption keys, get our DB connection, and create a `File`, with the bytes being the encrypted bytes of the incoming image.
@@ -432,39 +432,39 @@ That’s it for the storage layer. Let’s implement the network layer next.
 For our Nostr-based networking layer, we start the same way as with storage, by initializing a Nostr client that we can use from API functions using `thread_local` and `RefCell`:
 
 ```rust
-    thread_local! {
-        static NOSTR_CLIENT: RefCell<Option<nostr_sdk::Client>> = const { RefCell::new(None) };
-       ...
-    }
+thread_local! {
+    static NOSTR_CLIENT: RefCell<Option<nostr_sdk::Client>> = const { RefCell::new(None) };
+   ...
+}
 ```
 
 Then, we implement an `init_nostr_client` function, which takes a Nostr private key as a parameter:
 
 ```rust
-    async fn init_nostr_client(private_key: &str) {
-        let keys = nostr_sdk::Keys::parse(private_key).unwrap();
-        let client = nostr_sdk::Client::builder().signer(keys.clone()).build();
-        client.add_relay("wss://relay.damus.io").await.unwrap();
-    
-        client.connect().await;
-        let meta = nostr_sdk::Metadata::new()
-            .name("wasmTestUser")
-            .display_name("wasmTestUser");
-        client.set_metadata(&meta).await.unwrap();
-    
-        NOSTR_CLIENT.with(|cl| {
-            let mut client_ref = cl.borrow_mut();
-            if client_ref.is_none() {
-                *client_ref = Some(client);
-            }
-        });
-    }
-    
-    fn get_nostr_client() -> nostr_sdk::Client {
-        NOSTR_CLIENT
-            .with(|client| client.borrow().clone())
-            .expect("is initialized")
-    }
+async fn init_nostr_client(private_key: &str) {
+    let keys = nostr_sdk::Keys::parse(private_key).unwrap();
+    let client = nostr_sdk::Client::builder().signer(keys.clone()).build();
+    client.add_relay("wss://relay.damus.io").await.unwrap();
+
+    client.connect().await;
+    let meta = nostr_sdk::Metadata::new()
+        .name("wasmTestUser")
+        .display_name("wasmTestUser");
+    client.set_metadata(&meta).await.unwrap();
+
+    NOSTR_CLIENT.with(|cl| {
+        let mut client_ref = cl.borrow_mut();
+        if client_ref.is_none() {
+            *client_ref = Some(client);
+        }
+    });
+}
+
+fn get_nostr_client() -> nostr_sdk::Client {
+    NOSTR_CLIENT
+        .with(|client| client.borrow().clone())
+        .expect("is initialized")
+}
 ```
 
 We transform the given key to a Nostr `Keys` and create a new `Client`. We add a relay — in this case, just the default [damus.io](https://damus.io/) (one of the Nostr social network clients) relay and connect to it.
@@ -473,20 +473,20 @@ Then, we add some dummy metadata for our user and set the client to our `thread_
 Now, with the `get_nostr_client` function, we can adapt our `initialize` function to check if we already have keys in the storage or generate new ones and initialize our database and networking layer:
 
 ```rust
-    #[wasm_bindgen]
-    pub async fn initialize() -> String {
-        init_logging();
-        init_surreal_db().await;
-        if let Some(nostr_keys) = get_nostr_keys_from_db().await {
-            init_nostr_client(&nostr_keys.sk).await;
-            nostr_keys.pk
-        } else {
-            let nostr_keys = generate_nostr_keys();
-            save_nostr_keys_to_db(&nostr_keys).await;
-            save_encryption_keys_to_db(&generate_encryption_keys()).await;
-            nostr_keys.pk
-        }
+#[wasm_bindgen]
+pub async fn initialize() -> String {
+    init_logging();
+    init_surreal_db().await;
+    if let Some(nostr_keys) = get_nostr_keys_from_db().await {
+        init_nostr_client(&nostr_keys.sk).await;
+        nostr_keys.pk
+    } else {
+        let nostr_keys = generate_nostr_keys();
+        save_nostr_keys_to_db(&nostr_keys).await;
+        save_encryption_keys_to_db(&generate_encryption_keys()).await;
+        nostr_keys.pk
     }
+}
 ```
 
 We initialize logging and storage and, if we don’t have keys yet, generate and store them. Once we have the keys, we initialize the Nostr client.
@@ -494,49 +494,49 @@ We initialize logging and storage and, if we don’t have keys yet, generate and
 Next, let’s define the `Event` data structure that we’ll use to fetch Nostr messages from the network:
 
 ```rust
-    #[derive(Serialize, Deserialize, Clone)]
-    pub struct Event {
-        pub id: String,
-        pub pk: String,
-        pub content: String,
-        pub ts: u64,
-    }
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Event {
+    pub id: String,
+    pub pk: String,
+    pub content: String,
+    pub ts: u64,
+}
 ```
 
 We also define the function to generate initial Nostr keys:
 
 ```rust
-    pub fn generate_nostr_keys() -> Keys {
-        let keys = nostr_sdk::Keys::generate();
-        Keys {
-            sk: keys.secret_key().to_secret_hex(),
-            pk: keys.public_key().to_hex(),
-        }
+pub fn generate_nostr_keys() -> Keys {
+    let keys = nostr_sdk::Keys::generate();
+    Keys {
+        sk: keys.secret_key().to_secret_hex(),
+        pk: keys.public_key().to_hex(),
     }
+}
 ```
 
 Now we can get to sending messages to the Nostr network:
 
 ```rust
-    use wasm_bindgen_futures::spawn_local;
-    use log::info;
-    
-    #[wasm_bindgen]
-    pub async fn send_nostr_msg(msg: &str) {
-        let msg = msg.to_owned();
-        let msg_clone = msg.clone();
-        spawn_local(async move {
-            let event_builder = nostr_sdk::EventBuilder::text_note(msg_clone);
-            let event_id = get_nostr_client()
-                .send_event_builder(event_builder)
-                .await
-                .unwrap();
-            info!("sent event, event id: {}", event_id.id());
-        });
-        let encryption_keys = get_encryption_keys_from_db().await.unwrap();
-        let encrypted = hex::encode(encrypt(msg.as_bytes(), &encryption_keys.pk));
-        save_encrypted_msg(&encrypted).await;
-    }
+use wasm_bindgen_futures::spawn_local;
+use log::info;
+
+#[wasm_bindgen]
+pub async fn send_nostr_msg(msg: &str) {
+    let msg = msg.to_owned();
+    let msg_clone = msg.clone();
+    spawn_local(async move {
+        let event_builder = nostr_sdk::EventBuilder::text_note(msg_clone);
+        let event_id = get_nostr_client()
+            .send_event_builder(event_builder)
+            .await
+            .unwrap();
+        info!("sent event, event id: {}", event_id.id());
+    });
+    let encryption_keys = get_encryption_keys_from_db().await.unwrap();
+    let encrypted = hex::encode(encrypt(msg.as_bytes(), &encryption_keys.pk));
+    save_encrypted_msg(&encrypted).await;
+}
 ```
 
 In this function, we showcase how we can actually run something asynchronously in Rust using `wasm_bindgen_futures::spawn_local`, even if it’s called from JS/TS. This way, we can run entire background processes on the event loop in WASM.
@@ -546,16 +546,16 @@ We have to clone the message so we can pass it to the async function. Then, we u
 Finally, we encrypt the message and store it in IndexedDB with the following function:
 
 ```rust
-    async fn save_encrypted_msg(encrypted: &str) {
-        let db = get_db();
-        let _: Option<Message> = db
-            .create("msg")
-            .content(Message {
-                msg: encrypted.to_owned(),
-            })
-            .await
-            .unwrap();
-    }
+async fn save_encrypted_msg(encrypted: &str) {
+    let db = get_db();
+    let _: Option<Message> = db
+        .create("msg")
+        .content(Message {
+            msg: encrypted.to_owned(),
+        })
+        .await
+        .unwrap();
+}
 ```
 
 Nothing too surprising here; we simply save the given encrypted message into the `msg` table.
@@ -563,28 +563,28 @@ Nothing too surprising here; we simply save the given encrypted message into the
 With event sending in place, we can now implement fetching events from the Nostr network:
 
 ```rust
-    #[wasm_bindgen]
-    pub async fn fetch_nostr_events(from: &str) -> Result<JsValue, JsValue> {
-        let filter = nostr_sdk::Filter::new()
-            .author(nostr_sdk::PublicKey::parse(from).unwrap())
-            .kind(nostr_sdk::Kind::TextNote);
-        let events = get_nostr_client()
-            .fetch_events(filter, std::time::Duration::from_secs(10))
-            .await
-            .unwrap();
-        Ok(serde_wasm_bindgen::to_value(
-            &events
-                .into_iter()
-                .map(|e| Event {
-                    id: e.id.to_hex(),
-                    pk: e.pubkey.to_hex(),
-                    content: e.content,
-                    ts: e.created_at.as_u64(),
-                })
-                .collect::<Vec<Event>>(),
-        )
-        .unwrap())
-    }
+#[wasm_bindgen]
+pub async fn fetch_nostr_events(from: &str) -> Result<JsValue, JsValue> {
+    let filter = nostr_sdk::Filter::new()
+        .author(nostr_sdk::PublicKey::parse(from).unwrap())
+        .kind(nostr_sdk::Kind::TextNote);
+    let events = get_nostr_client()
+        .fetch_events(filter, std::time::Duration::from_secs(10))
+        .await
+        .unwrap();
+    Ok(serde_wasm_bindgen::to_value(
+        &events
+            .into_iter()
+            .map(|e| Event {
+                id: e.id.to_hex(),
+                pk: e.pubkey.to_hex(),
+                content: e.content,
+                ts: e.created_at.as_u64(),
+            })
+            .collect::<Vec<Event>>(),
+    )
+    .unwrap())
+}
 ```
 
 We first create a Nostr `Filter`, which we configure to just filter for `TextNote` events from ourselves (`author`). Here, we could also define other filters to get other kinds of messages from the network, such as only fetching events that have been published in the last X days or hours.
@@ -598,38 +598,38 @@ That’s it for our simple networking layer. Of course, we could have also used 
 Finally, let’s build a very simple GUI to interact with the API we built in Rust for Wasm:
 
 ```html
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="#000000">
-        <link rel="manifest" href="/manifest.json">
-        <title>Example PWA with Rust</title>
-    </head>
-    <body>
-        <h1>Example PWA using Rust</h1>
-        <div>Local npub: <span id="npub"></span></div>
-        <input type="text" id="inp"/>
-        <button id="sb">Send</button>
-        <button id="fetch">Fetch Nostr Events</button>
-        <h3>Remote Nostr Events:</h3>
-        <div id="remote_events"></div>
-        <h3>Local decrypted messages:</h3>
-        <div id="local_messages"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="/manifest.json">
+    <title>Example PWA with Rust</title>
+</head>
+<body>
+    <h1>Example PWA using Rust</h1>
+    <div>Local npub: <span id="npub"></span></div>
+    <input type="text" id="inp"/>
+    <button id="sb">Send</button>
+    <button id="fetch">Fetch Nostr Events</button>
+    <h3>Remote Nostr Events:</h3>
+    <div id="remote_events"></div>
+    <h3>Local decrypted messages:</h3>
+    <div id="local_messages"></div>
+    <div>
+        <h2>Uploads</h2>
         <div>
-            <h2>Uploads</h2>
-            <div>
-                <input type="file" id="file_input" />
-                <button type="button" id="upload">upload</button>
-                <button type="button" id="fetch_images">Fetch Images</button>
-            </div>
-            <div id="files">
-            </div>
+            <input type="file" id="file_input" />
+            <button type="button" id="upload">upload</button>
+            <button type="button" id="fetch_images">Fetch Images</button>
         </div>
-        <script type="module" src="/main.js"></script>
-    </body>
-    </html>
+        <div id="files">
+        </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+</body>
+</html>
 ```
 
 We add a few things to `index.html`. First, we create a div to display our `npub`, which is the public key and, at the same time, the identifier on the Nostr network.
@@ -645,24 +645,24 @@ Of course, in a real application, we could also use frameworks such as Svelte, V
 In this case, we will just use vanilla JavaScript to import and use our API functions:
 
 ```javascript
-    import init, {
-        save_image,
-        fetch_images,
-        initialize,
-        send_nostr_msg,
-        fetch_nostr_events,
-        fetch_and_decrypt_local_messages
-    } from '../pkg/index.js';
-    
-    let npub;
-    async function run() {
-        await init();
-        npub = await initialize();
-        document.getElementById("npub").textContent = npub;
-        await refresh_local_messages();
-    }
-    
-    await run();
+import init, {
+    save_image,
+    fetch_images,
+    initialize,
+    send_nostr_msg,
+    fetch_nostr_events,
+    fetch_and_decrypt_local_messages
+} from '../pkg/index.js';
+
+let npub;
+async function run() {
+    await init();
+    npub = await initialize();
+    document.getElementById("npub").textContent = npub;
+    await refresh_local_messages();
+}
+
+await run();
 ```
 
 We simply import the exported functions from the generated `pkg/index.js` in the same way we did before with the `initialize` function.
@@ -670,16 +670,16 @@ We simply import the exported functions from the generated `pkg/index.js` in the
 Then, we store the `npub` returned from the new `initialize` function, set it to the container for the npub, and call a function to refresh the local messages, so on startup, we display all locally stored messages:
 
 ```javascript
-    async function refresh_local_messages() {
-        let local_messages = await fetch_and_decrypt_local_messages();
-        let container = document.getElementById("local_messages");
-        container.innerHTML = "";
-        local_messages.forEach(str => {
-            let div = document.createElement("div");
-            div.textContent = str;
-            container.appendChild(div);
-        });
-    }
+async function refresh_local_messages() {
+    let local_messages = await fetch_and_decrypt_local_messages();
+    let container = document.getElementById("local_messages");
+    container.innerHTML = "";
+    local_messages.forEach(str => {
+        let div = document.createElement("div");
+        div.textContent = str;
+        container.appendChild(div);
+    });
+}
 ```
 
 Here, we just call the `fetch_and_decrypt_local_messages` Wasm function, iterate the results, and add a dir for each of them into the local messages container.
@@ -687,15 +687,15 @@ Here, we just call the `fetch_and_decrypt_local_messages` Wasm function, iterate
 Next, let’s implement the event handlers for sending messages and fetching remote messages from Nostr:
 
 ```javascript
-    document.getElementById("sb").addEventListener("click", async () => {
-        let input = document.getElementById("inp").value;
-        await send_nostr_msg(input);
-        await refresh_local_messages();
-    });
-    
-    document.getElementById("fetch").addEventListener("click", async () => {
-        await refresh_remote_messages();
-    });
+document.getElementById("sb").addEventListener("click", async () => {
+    let input = document.getElementById("inp").value;
+    await send_nostr_msg(input);
+    await refresh_local_messages();
+});
+
+document.getElementById("fetch").addEventListener("click", async () => {
+    await refresh_remote_messages();
+});
 ```
 
 When clicking the `Send` button, we send the text from the `inp` text input to the Nostr network using the `send_nostr_msg` Wasm function and call `refresh_local_messages`, so the new message is immediately shown.
@@ -703,16 +703,16 @@ When clicking the `Send` button, we send the text from the `inp` text input to t
 Similarly, on clicking the `Fetch` button, we re-fetch and refresh the remote messages as well with the following function:
 
 ```javascript
-    async function refresh_remote_messages() {
-        let events = await fetch_nostr_events(npub);
-        let container = document.getElementById("remote_events");
-        container.innerHTML = "";
-        events.forEach(event => {
-            let div = document.createElement("div");
-            div.textContent = event.content + " at " + event.ts + " (" + event.id + ")";
-            container.appendChild(div);
-        });
-    }
+async function refresh_remote_messages() {
+    let events = await fetch_nostr_events(npub);
+    let container = document.getElementById("remote_events");
+    container.innerHTML = "";
+    events.forEach(event => {
+        let div = document.createElement("div");
+        div.textContent = event.content + " at " + event.ts + " (" + event.id + ")";
+        container.appendChild(div);
+    });
+}
 ```
 
 We fetch the Nostr events using the Wasm function `fetch_nostr_events` and put a div with the content, timestamp, and ID of the events into the message container.
@@ -720,33 +720,33 @@ We fetch the Nostr events using the Wasm function `fetch_nostr_events` and put a
 Finally, let’s implement the file upload and fetching logic in our very basic GUI:
 
 ```javascript
-    document.getElementById("upload").addEventListener("click", async () => {
-        const file = document.getElementById("file_input").files[0];
-        if (!file) return;
-    
-        const name = file.name;
-        const bytes = await file.arrayBuffer();
-        const data = new Uint8Array(bytes);
-    
-        await save_image(name, data);
-        console.log("upload successful");
+document.getElementById("upload").addEventListener("click", async () => {
+    const file = document.getElementById("file_input").files[0];
+    if (!file) return;
+
+    const name = file.name;
+    const bytes = await file.arrayBuffer();
+    const data = new Uint8Array(bytes);
+
+    await save_image(name, data);
+    console.log("upload successful");
+});
+
+document.getElementById("fetch_images").addEventListener("click", async () => {
+    let files = await fetch_images();
+    let container = document.getElementById("files");
+    container.innerHTML = "";
+    files.forEach(file => {
+        let arr = new Uint8Array(file.bytes);
+        let blob = new Blob([arr]);
+        let url = URL.createObjectURL(blob);
+
+        console.log("file", file, url, blob);
+        let img = document.createElement("img");
+        img.src = url;
+        container.appendChild(img);
     });
-    
-    document.getElementById("fetch_images").addEventListener("click", async () => {
-        let files = await fetch_images();
-        let container = document.getElementById("files");
-        container.innerHTML = "";
-        files.forEach(file => {
-            let arr = new Uint8Array(file.bytes);
-            let blob = new Blob([arr]);
-            let url = URL.createObjectURL(blob);
-    
-            console.log("file", file, url, blob);
-            let img = document.createElement("img");
-            img.src = url;
-            container.appendChild(img);
-        });
-    });
+});
 ```
 
 For uploading, we take the file from the file input and transform the bytes of the file to a `Uint8Array`, so we can pass it to the Rust-based Wasm API as a `Vec<u8>`. We also send the file name and call the Wasm function `save_image` to encrypt and store the image in [IndexedDB](https://blog.logrocket.com/using-indexeddb-complete-guide/).
@@ -760,7 +760,7 @@ That’s it for our very basic GUI. Now, let’s see if all of this works!
 As mentioned above, we use `wasm-pack` to build our Wasm binary:
 
 ```bash
-    wasm-pack build --dev --target web --out-name index
+wasm-pack build --dev --target web --out-name index
 ```
 
 If we run this and check the `pkg` folder, we’ll see the following files:
